@@ -68,3 +68,6 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- **2026-06-27:** GitHub repo created. React app running locally at localhost:3000. 
+  Ready to connect GitHub repo to local project and push first commit.
+  Next step: Push to GitHub → Connect Vercel → Build first crossword.
