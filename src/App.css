@@ -188,6 +188,101 @@ body {
   margin-right: 4px;
 }
 
+/* ── Mode selector ─────────────────────────────────────────────────────────── */
+.mode-selector {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.mode-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #444;
+  white-space: nowrap;
+}
+
+.mode-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mode-btn {
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 2px solid #bbb;
+  border-radius: 20px;
+  background: #fff;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.mode-btn:hover {
+  border-color: #2980b9;
+  color: #2980b9;
+}
+
+.mode-btn-active {
+  background: #2980b9;
+  border-color: #2980b9;
+  color: #fff;
+}
+
+/* ── Reveal button ──────────────────────────────────────────────────────────── */
+.btn-reveal {
+  background: #8e44ad;
+  color: #fff;
+}
+.btn-reveal:hover { background: #6c3483; }
+
+/* ── Legend ─────────────────────────────────────────────────────────────────── */
+.legend {
+  margin-top: 20px;
+  padding: 14px 16px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  max-width: 510px;
+}
+
+.legend-swatches {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #444;
+}
+
+.legend-swatch {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+}
+
+.swatch-correct   { background: #a9dfbf; }
+.swatch-incorrect { background: #f1948a; }
+.swatch-white     { background: #fff; }
+
+.legend-description {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+}
+
 /* ── Mobile ────────────────────────────────────────────────────────────────── */
 @media (max-width: 680px) {
   .puzzle-layout {

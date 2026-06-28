@@ -1,16 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { words, GRID_ROWS, GRID_COLS } from '../data/puzzleData';
+import { adminConfig } from '../data/adminConfig';
 
 // ── Build the answer grid once when the app loads ─────────────────────────────
-// This turns the word list into a 2D grid where each cell knows its correct
-// letter, clue number, and which across/down word it belongs to.
 function buildSolvedGrid() {
-  // Start with all cells as null (black squares)
   const grid = Array.from({ length: GRID_ROWS }, () =>
     Array.from({ length: GRID_COLS }, () => null)
   );
 
-  // First pass: fill in letters from each word
   words.forEach(({ word, direction, row, col }) => {
     for (let i = 0; i < word.length; i++) {
       const r = direction === 'down' ? row + i : row;
@@ -21,11 +18,8 @@ function buildSolvedGrid() {
     }
   });
 
-  // Second pass: assign clue numbers and track which word each cell belongs to
   words.forEach(({ number, word, direction, row, col }) => {
-    // The starting cell of each word gets the clue number
     grid[row][col].number = number;
-
     for (let i = 0; i < word.length; i++) {
       const r = direction === 'down' ? row + i : row;
       const c = direction === 'across' ? col + i : col;
@@ -37,94 +31,108 @@ function buildSolvedGrid() {
   return grid;
 }
 
-// Build these once at module load — they never change
 const solvedGrid = buildSolvedGrid();
 const acrossWords = words.filter(w => w.direction === 'across');
 const downWords = words.filter(w => w.direction === 'down');
 
+// Work out which mode to start in based on admin config
+function getDefaultMode() {
+  const d = adminConfig.defaultMode;
+  if (d === 'checkAnswers' && adminConfig.allowCheckAnswers) return 'checkAnswers';
+  if (d === 'liveFeedback' && adminConfig.allowLiveFeedback) return 'liveFeedback';
+  if (d === 'reveal' && (adminConfig.allowRevealLetter || adminConfig.allowRevealWord)) return 'reveal';
+  // Fallback to first available mode
+  if (adminConfig.allowCheckAnswers) return 'checkAnswers';
+  if (adminConfig.allowLiveFeedback) return 'liveFeedback';
+  return 'reveal';
+}
+
 // ── Main Crossword Component ───────────────────────────────────────────────────
 export default function Crossword() {
-  // What the user has typed — a 2D array of letters (empty string = blank)
   const [userGrid, setUserGrid] = useState(() =>
     Array.from({ length: GRID_ROWS }, () => Array(GRID_COLS).fill(''))
   );
-
-  // Which cell is currently selected
-  const [selected, setSelected] = useState({ row: 0, col: 0 });
-
-  // Are we filling across or down?
+  const [selected, setSelected]   = useState({ row: 0, col: 0 });
   const [direction, setDirection] = useState('across');
+  const [checked, setChecked]     = useState(false);
+  const [solved, setSolved]       = useState(false);
+  const [mode, setMode]           = useState(getDefaultMode);
 
-  // Has the user clicked "Check Answers"?
-  const [checked, setChecked] = useState(false);
-
-  // Did the user solve it correctly?
-  const [solved, setSolved] = useState(false);
-
-  // The grid div captures keyboard events
   const gridRef = useRef(null);
 
-  // Focus the grid on first load so user can type immediately
   useEffect(() => {
     gridRef.current?.focus();
   }, []);
 
-  // ── Cell click handler ──────────────────────────────────────────────────────
+  // ── Check if every cell is correct (works for any grid snapshot) ───────────
+  function isPuzzleSolved(grid) {
+    return words.every(({ word, direction, row, col }) => {
+      for (let i = 0; i < word.length; i++) {
+        const r = direction === 'down' ? row + i : row;
+        const c = direction === 'across' ? col + i : col;
+        if (grid[r][c] !== word[i]) return false;
+      }
+      return true;
+    });
+  }
+
+  // ── Mode switcher ──────────────────────────────────────────────────────────
+  function switchMode(newMode) {
+    setMode(newMode);
+    setChecked(false); // clear any red/green when switching modes
+  }
+
+  // ── Cell click ─────────────────────────────────────────────────────────────
   function handleCellClick(row, col) {
     const cell = solvedGrid[row][col];
-    if (!cell) return; // ignore black squares
+    if (!cell) return;
 
     if (selected.row === row && selected.col === col) {
-      // Clicking the same cell toggles direction (if both directions are available)
       setDirection(prev => {
         const next = prev === 'across' ? 'down' : 'across';
         if (next === 'across' && cell.acrossNum) return 'across';
         if (next === 'down' && cell.downNum) return 'down';
-        return prev; // can't switch, stay put
+        return prev;
       });
     } else {
       setSelected({ row, col });
-      // Auto-select a valid direction for this cell
       if (!cell.acrossNum) setDirection('down');
       else if (!cell.downNum) setDirection('across');
-      // else keep the current direction
     }
 
     gridRef.current?.focus();
   }
 
-  // ── Clue click handler ──────────────────────────────────────────────────────
+  // ── Clue click ─────────────────────────────────────────────────────────────
   function handleClueClick(wordDef) {
     setSelected({ row: wordDef.row, col: wordDef.col });
     setDirection(wordDef.direction);
     gridRef.current?.focus();
   }
 
-  // ── Keyboard handler ────────────────────────────────────────────────────────
+  // ── Keyboard ────────────────────────────────────────────────────────────────
   function handleKeyDown(e) {
     const { row, col } = selected;
 
-    // Letter key: fill the cell and move forward one step
     if (/^[a-zA-Z]$/.test(e.key)) {
       e.preventDefault();
       const newGrid = userGrid.map(r => [...r]);
       newGrid[row][col] = e.key.toUpperCase();
       setUserGrid(newGrid);
       setChecked(false);
-      setSolved(false);
+      // In live feedback mode, auto-detect solve after each keystroke
+      if (mode === 'liveFeedback' && isPuzzleSolved(newGrid)) setSolved(true);
+      else setSolved(false);
       stepSelection(row, col, 1);
       return;
     }
 
-    // Backspace: clear current cell, step back one
     if (e.key === 'Backspace') {
       e.preventDefault();
       const newGrid = userGrid.map(r => [...r]);
       if (newGrid[row][col]) {
-        // Cell has a letter — just clear it
         newGrid[row][col] = '';
       } else {
-        // Cell is empty — go back and clear the previous cell
         const pr = direction === 'down' ? row - 1 : row;
         const pc = direction === 'across' ? col - 1 : col;
         if (pr >= 0 && pc >= 0 && solvedGrid[pr]?.[pc]) {
@@ -138,14 +146,12 @@ export default function Crossword() {
       return;
     }
 
-    // Arrow keys: navigate and switch direction
     if (e.key === 'ArrowRight') { e.preventDefault(); setDirection('across'); jumpToNextCell(row, col, 0, 1); }
     if (e.key === 'ArrowLeft')  { e.preventDefault(); setDirection('across'); jumpToNextCell(row, col, 0, -1); }
     if (e.key === 'ArrowDown')  { e.preventDefault(); setDirection('down');   jumpToNextCell(row, col, 1, 0); }
     if (e.key === 'ArrowUp')    { e.preventDefault(); setDirection('down');   jumpToNextCell(row, col, -1, 0); }
   }
 
-  // Move one step forward or back while typing (stops at word boundary)
   function stepSelection(row, col, delta) {
     const dr = direction === 'down' ? delta : 0;
     const dc = direction === 'across' ? delta : 0;
@@ -155,7 +161,6 @@ export default function Crossword() {
     }
   }
 
-  // Arrow key navigation — skip over black squares to the next white cell
   function jumpToNextCell(row, col, dr, dc) {
     let r = row + dr, c = col + dc;
     while (r >= 0 && r < GRID_ROWS && c >= 0 && c < GRID_COLS) {
@@ -164,65 +169,130 @@ export default function Crossword() {
     }
   }
 
-  // ── Check answers ───────────────────────────────────────────────────────────
+  // ── Check Answers (Mode 1 + Reveal mode) ──────────────────────────────────
   function checkAnswers() {
     setChecked(true);
-    const allCorrect = words.every(({ word, direction, row, col }) => {
-      for (let i = 0; i < word.length; i++) {
-        const r = direction === 'down' ? row + i : row;
-        const c = direction === 'across' ? col + i : col;
-        if (userGrid[r][c] !== word[i]) return false;
-      }
-      return true;
-    });
-    setSolved(allCorrect);
+    if (isPuzzleSolved(userGrid)) setSolved(true);
   }
 
-  // ── Clear puzzle ─────────────────────────────────────────────────────────────
+  // ── Reveal Letter (Mode 3a) ────────────────────────────────────────────────
+  function revealLetter() {
+    const { row, col } = selected;
+    if (!solvedGrid[row][col]) return;
+    const newGrid = userGrid.map(r => [...r]);
+    newGrid[row][col] = solvedGrid[row][col].letter;
+    setUserGrid(newGrid);
+    if (isPuzzleSolved(newGrid)) setSolved(true);
+  }
+
+  // ── Reveal Word (Mode 3b) ──────────────────────────────────────────────────
+  function revealWord() {
+    const selCell = solvedGrid[selected.row][selected.col];
+    if (!selCell) return;
+    const wordNum = direction === 'across' ? selCell.acrossNum : selCell.downNum;
+    const wordDef = words.find(w => w.number === wordNum);
+    if (!wordDef) return;
+
+    const newGrid = userGrid.map(r => [...r]);
+    for (let i = 0; i < wordDef.word.length; i++) {
+      const r = wordDef.direction === 'down' ? wordDef.row + i : wordDef.row;
+      const c = wordDef.direction === 'across' ? wordDef.col + i : wordDef.col;
+      newGrid[r][c] = wordDef.word[i];
+    }
+    setUserGrid(newGrid);
+    if (isPuzzleSolved(newGrid)) setSolved(true);
+  }
+
+  // ── Clear ──────────────────────────────────────────────────────────────────
   function clearPuzzle() {
     setUserGrid(Array.from({ length: GRID_ROWS }, () => Array(GRID_COLS).fill('')));
     setChecked(false);
     setSolved(false);
   }
 
-  // ── Cell visual state ───────────────────────────────────────────────────────
-  // Returns a CSS class suffix: black, selected, highlighted, correct, incorrect, or white
+  // ── Cell colour ────────────────────────────────────────────────────────────
   function getCellStatus(row, col) {
     const cell = solvedGrid[row][col];
     if (!cell) return 'black';
     if (selected.row === row && selected.col === col) return 'selected';
     if (isInSelectedWord(row, col)) return 'highlighted';
-    if (checked && userGrid[row][col]) {
-      return userGrid[row][col] === cell.letter ? 'correct' : 'incorrect';
+
+    if (userGrid[row][col]) {
+      // Live feedback: always colour filled cells
+      // Check Answers / Reveal: only colour after Check Answers clicked
+      const showColour = mode === 'liveFeedback' || checked;
+      if (showColour) {
+        return userGrid[row][col] === cell.letter ? 'correct' : 'incorrect';
+      }
     }
     return 'white';
   }
 
-  // Is this cell part of the currently selected word?
   function isInSelectedWord(row, col) {
     const cell = solvedGrid[row][col];
     const selCell = solvedGrid[selected.row][selected.col];
     if (!cell || !selCell) return false;
-
     if (direction === 'across') {
-      return row === selected.row
-        && selCell.acrossNum !== null
-        && cell.acrossNum === selCell.acrossNum;
+      return row === selected.row && selCell.acrossNum !== null && cell.acrossNum === selCell.acrossNum;
     }
-    return col === selected.col
-      && selCell.downNum !== null
-      && cell.downNum === selCell.downNum;
+    return col === selected.col && selCell.downNum !== null && cell.downNum === selCell.downNum;
   }
 
-  // Figure out which clue is active (to highlight it in the clue list)
   const activeCell = solvedGrid[selected.row]?.[selected.col];
   const activeClueNum = direction === 'across' ? activeCell?.acrossNum : activeCell?.downNum;
+
+  // How many modes does the admin allow? If only one, hide the selector.
+  const availableModes = [
+    adminConfig.allowCheckAnswers && 'checkAnswers',
+    adminConfig.allowLiveFeedback && 'liveFeedback',
+    (adminConfig.allowRevealLetter || adminConfig.allowRevealWord) && 'reveal',
+  ].filter(Boolean);
+
+  // Legend description text changes per mode
+  const legendDescriptions = {
+    checkAnswers: 'Fill in the whole puzzle, then click Check Answers to see how you did.',
+    liveFeedback: 'Each letter turns green or red the instant you type it.',
+    reveal:       'Get stuck? Use Reveal Letter or Reveal Word. Click Check Answers when you\'re ready.',
+  };
 
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
     <div className="crossword-container">
       <h1 className="puzzle-title">AI Concepts Crossword</h1>
       <p className="puzzle-subtitle">Beginner Level · 10 Words · Click a cell, then type</p>
+
+      {/* ── Mode selector (hidden if only one mode is available) ── */}
+      {availableModes.length > 1 && (
+        <div className="mode-selector">
+          <span className="mode-label">How do you want to play?</span>
+          <div className="mode-buttons">
+            {adminConfig.allowCheckAnswers && (
+              <button
+                className={`mode-btn ${mode === 'checkAnswers' ? 'mode-btn-active' : ''}`}
+                onClick={() => switchMode('checkAnswers')}
+              >
+                Check Answers
+              </button>
+            )}
+            {adminConfig.allowLiveFeedback && (
+              <button
+                className={`mode-btn ${mode === 'liveFeedback' ? 'mode-btn-active' : ''}`}
+                onClick={() => switchMode('liveFeedback')}
+              >
+                Live Feedback
+              </button>
+            )}
+            {(adminConfig.allowRevealLetter || adminConfig.allowRevealWord) && (
+              <button
+                className={`mode-btn ${mode === 'reveal' ? 'mode-btn-active' : ''}`}
+                onClick={() => switchMode('reveal')}
+              >
+                Reveal on Demand
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {solved && (
         <div className="success-banner">
@@ -232,7 +302,7 @@ export default function Crossword() {
 
       <div className="puzzle-layout">
 
-        {/* Left side: grid + buttons */}
+        {/* ── Grid + buttons + legend ── */}
         <div>
           <div
             ref={gridRef}
@@ -251,31 +321,54 @@ export default function Crossword() {
                     className={`cell cell-${status}`}
                     onClick={() => handleCellClick(r, c)}
                   >
-                    {/* Clue number in top-left corner */}
-                    {cell?.number && (
-                      <span className="cell-number">{cell.number}</span>
-                    )}
-                    {/* Letter the user typed */}
-                    {cell && (
-                      <span className="cell-letter">{userGrid[r][c]}</span>
-                    )}
+                    {cell?.number && <span className="cell-number">{cell.number}</span>}
+                    {cell && <span className="cell-letter">{userGrid[r][c]}</span>}
                   </div>
                 );
               })
             )}
           </div>
 
+          {/* ── Action buttons (change based on mode) ── */}
           <div className="grid-buttons">
-            <button className="btn btn-check" onClick={checkAnswers}>
-              Check Answers
-            </button>
+            {(mode === 'checkAnswers' || mode === 'reveal') && (
+              <button className="btn btn-check" onClick={checkAnswers}>
+                Check Answers
+              </button>
+            )}
+            {mode === 'reveal' && adminConfig.allowRevealLetter && (
+              <button className="btn btn-reveal" onClick={revealLetter}>
+                Reveal Letter
+              </button>
+            )}
+            {mode === 'reveal' && adminConfig.allowRevealWord && (
+              <button className="btn btn-reveal" onClick={revealWord}>
+                Reveal Word
+              </button>
+            )}
             <button className="btn btn-clear" onClick={clearPuzzle}>
               Clear
             </button>
           </div>
+
+          {/* ── Legend ── */}
+          <div className="legend">
+            <div className="legend-swatches">
+              <span className="legend-item">
+                <span className="legend-swatch swatch-correct"></span> Correct
+              </span>
+              <span className="legend-item">
+                <span className="legend-swatch swatch-incorrect"></span> Wrong
+              </span>
+              <span className="legend-item">
+                <span className="legend-swatch swatch-white"></span> Not checked yet
+              </span>
+            </div>
+            <p className="legend-description">{legendDescriptions[mode]}</p>
+          </div>
         </div>
 
-        {/* Right side: clue lists */}
+        {/* ── Clues panel ── */}
         <div className="clues-panel">
           <div className="clues-section">
             <h3>Across</h3>
@@ -289,7 +382,6 @@ export default function Crossword() {
               </div>
             ))}
           </div>
-
           <div className="clues-section">
             <h3>Down</h3>
             {downWords.map(w => (
