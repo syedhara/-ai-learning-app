@@ -32,7 +32,7 @@ Future features (later sprints):
 | Layer | Technology |
 |-------|-----------|
 | Frontend | React (JavaScript) |
-| Styling | Tailwind CSS |
+| Styling | Plain CSS (Tailwind deferred — not yet installed) |
 | Backend | None (for now) |
 | Database | None (for now — puzzle data in app) |
 | Hosting | Vercel (free tier) |
@@ -78,10 +78,11 @@ When writing code for this project:
 
 ## Current Sprint — Sprint 1
 
-- [ ] Push project to GitHub
-- [ ] Connect to Vercel and deploy
-- [ ] Build first working crossword (10–15 AI terms, Beginner level)
+- [x] Push project to GitHub
+- [x] Connect to Vercel and deploy — https://github.com/syedhara/-ai-learning-app
+- [x] Build first working crossword (10 AI terms, Beginner level)
 - [ ] Add difficulty level selector
+- [ ] Build hint/check system (see Requirements below)
 
 ---
 
@@ -127,8 +128,82 @@ git push
 
 ---
 
+## Requirements
+
+### Crossword Puzzle — Hint & Check System
+
+Users can choose how much help they want while solving the puzzle. Three modes are available, and the user selects their preferred mode before or during play.
+
+---
+
+#### Mode 1 — Check Answers (Final Check)
+- User fills in the entire puzzle, then clicks "Check Answers"
+- Correct cells turn **green**, wrong cells turn **red**
+- Empty cells are ignored (no penalty)
+- If everything is correct, a congratulations banner appears
+- Typing again clears the color feedback
+- **Good for:** Confident learners who want no hints during play
+
+#### Mode 2 — Check as You Type (Live Feedback)
+- As soon as the user types a letter, the cell immediately turns green or red
+- No button needed — feedback is instant
+- **Good for:** Learners who want real-time reinforcement
+
+#### Mode 3 — Reveal on Demand (Generous Mode)
+Two sub-options available to the user:
+- **Reveal Letter** — fills in just the selected cell with the correct answer
+- **Reveal Word** — fills in all cells of the currently selected word
+
+The user can use these at any time, no restrictions.
+
+**Good for:** Beginners who get stuck and want to learn by seeing the answer
+
+---
+
+#### User Choice
+- A **mode selector** (e.g. toggle or dropdown) is shown to the user at the top of the puzzle
+- Default mode: **Check Answers** (least revealing)
+- User can switch modes at any time during play
+- Selection persists within the session (not saved across visits yet)
+
+---
+
+#### Admin Controls
+An admin-level configuration (stored in `src/data/adminConfig.js`) controls which modes are available:
+
+```js
+// Example admin config
+export const adminConfig = {
+  allowCheckAnswers: true,       // Mode 1
+  allowCheckAsYouType: true,     // Mode 2
+  allowRevealLetter: true,       // Mode 3a
+  allowRevealWord: true,         // Mode 3b
+  defaultMode: 'checkAnswers',   // Which mode is pre-selected
+};
+```
+
+- If a mode is disabled by admin, it is hidden from the user's mode selector
+- This allows the app to be configured for different audiences (e.g. classroom = no reveal, casual = all modes on)
+- Admin config is a code-level change for now (no UI admin panel yet)
+
+---
+
+### Crossword Puzzle — Grid & Gameplay
+
+- 10 AI terms per puzzle (Beginner level)
+- Words intersect at shared letters (standard crossword rules)
+- Click a cell to select it; click again to toggle Across ↔ Down
+- Type to fill letters; cursor auto-advances
+- Backspace clears and moves back
+- Arrow keys navigate
+- Clicking a clue in the panel jumps to that word's first cell
+- Active word is highlighted in blue; selected cell is darker blue
+
+---
+
 ## Session Notes
 
 Use this section to track decisions made across sessions:
 
 - **2026-06-27:** Project started. Chose web-first approach over Android. React + Vercel stack decided. Environment fully set up on Mac.
+- **2026-06-28:** GitHub pushed. Vercel deployed. First crossword built (10 words, Beginner). Hint/check system requirements defined — 3 modes with admin config toggle.
