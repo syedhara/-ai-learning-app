@@ -1,0 +1,16 @@
+{
+  "beginner": [
+    { "word": "CHATBOT",       "clue": "An AI system designed to have text conversations",     "category": "general" },
+    { "word": "HALLUCINATION", "clue": "When an AI confidently states something false",         "category": "general" },
+    { "word": "TRAINING",      "clue": "The process of teaching an AI using data",              "category": "general" },
+    { "word": "TOKEN",         "clue": "The unit AI models use to measure text length",         "category": "general" },
+    { "word": "PROMPT",        "clue": "The instruction you give an AI to get a response",      "category": "general" },
+    { "word": "MODEL",         "clue": "The trained AI system that generates responses",        "category": "general" },
+    { "word": "FINETUNE",      "clue": "To further train an existing model on specific data",   "category": "general" },
+    { "word": "DATASET",       "clue": "A collection of data used to train an AI",             "category": "general" },
+    { "word": "OUTPUT",        "clue": "What the AI produces in response to your input",        "category": "general" },
+    { "word": "NEURAL",        "clue": "Type of ___ network inspired by the human brain",       "category": "general" }
+  ],
+  "intermediate": [],
+  "advanced": []
+}

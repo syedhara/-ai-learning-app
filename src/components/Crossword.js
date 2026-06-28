@@ -258,7 +258,7 @@ export default function Crossword() {
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
     <div className="crossword-container">
-      <h1 className="puzzle-title">AI Concepts Crossword</h1>
+      <h1 className="puzzle-title">Learn AI · Crossword</h1>
       <p className="puzzle-subtitle">Beginner Level · 10 Words · Click a cell, then type</p>
 
       {/* ── Mode selector (hidden if only one mode is available) ── */}
