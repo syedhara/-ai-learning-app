@@ -3,7 +3,7 @@
     "bfortuner/ml-glossary (MIT License) — github.com/bfortuner/ml-glossary",
     "holasoymalva/llm-glossary (Open Source) — github.com/holasoymalva/llm-glossary"
   ],
-  "_notes": "Single-word terms only for now. Multi-word terms (marked with *) are reserved for the word-break feature in a future sprint.",
+  "_notes": "Multi-word terms stored without space (e.g. DEEPLEARNING). breakAfter = letter count of the first word, used to draw the visual break marker.",
 
   "beginner": [
     { "word": "CHATBOT",      "clue": "An AI system designed to have text conversations",       "category": "general" },
@@ -23,7 +23,9 @@
     { "word": "OUTLIER",      "clue": "A data point that is very different from the rest",       "category": "general" },
     { "word": "INFERENCE",    "clue": "Using a trained model to make predictions on new data",   "category": "general" },
     { "word": "AGENTS",       "clue": "Autonomous AI systems that complete complex tasks",       "category": "general" },
-    { "word": "CONTEXT",      "clue": "The surrounding information an AI uses to understand a question", "category": "general" }
+    { "word": "CONTEXT",      "clue": "The surrounding information an AI uses to understand a question", "category": "general" },
+    { "word": "DEEPLEARNING",  "clue": "Neural networks with many stacked hidden layers (2 words)", "category": "general", "multiword": true, "breakAfter": 4 },
+    { "word": "CONTEXTWINDOW", "clue": "How much text an AI can read and process at once (2 words)", "category": "general", "multiword": true, "breakAfter": 7 }
   ],
 
   "intermediate": [
@@ -59,9 +61,9 @@
     { "word": "REINFORCEMENT",  "clue": "___ learning trains a model by rewarding good decisions","category": "ml" }
   ],
 
-  "_multiword_reserved": [
-    "MACHINE LEARNING", "DEEP LEARNING", "NATURAL LANGUAGE PROCESSING",
-    "LARGE LANGUAGE MODEL", "CONTEXT WINDOW", "PROMPT ENGINEERING",
+  "_multiword_future": [
+    "MACHINE LEARNING", "NATURAL LANGUAGE PROCESSING",
+    "LARGE LANGUAGE MODEL", "PROMPT ENGINEERING",
     "TRANSFER LEARNING", "GRADIENT DESCENT", "RETRIEVAL AUGMENTED GENERATION",
     "REINFORCEMENT LEARNING FROM HUMAN FEEDBACK"
   ]

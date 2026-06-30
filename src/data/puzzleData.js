@@ -1,24 +1,27 @@
 import wordBank from './wordBank.json';
 
-// Grid dimensions
+// Grid dimensions — must match the generator in src/utils/generateCrossword.js
 export const GRID_ROWS = 13;
 export const GRID_COLS = 14;
 
-// Pull a word's text and clue from the word bank so we don't hardcode them here
-const beginner = wordBank.beginner;
-const lookup = (w) => beginner.find(entry => entry.word === w) || { word: w, clue: '' };
+// Helper: pull specific words from a difficulty level in wordBank.json
+const pick = (level, wordNames) =>
+  wordNames.map(w => wordBank[level].find(e => e.word === w)).filter(Boolean);
 
-// Puzzle layout — defines where each word sits on the grid (row, col, direction).
-// Word text and clues come from wordBank.json above.
-export const words = [
-  { number: 1,  direction: 'across', row: 0, col: 0,  ...lookup('CHATBOT')       },
-  { number: 2,  direction: 'down',   row: 0, col: 1,  ...lookup('HALLUCINATION') },
-  { number: 3,  direction: 'down',   row: 0, col: 3,  ...lookup('TRAINING')      },
-  { number: 4,  direction: 'down',   row: 0, col: 6,  ...lookup('TOKEN')         },
-  { number: 5,  direction: 'across', row: 1, col: 4,  ...lookup('PROMPT')        },
-  { number: 6,  direction: 'down',   row: 1, col: 7,  ...lookup('MODEL')         },
-  { number: 7,  direction: 'down',   row: 3, col: 4,  ...lookup('FINETUNE')      },
-  { number: 8,  direction: 'across', row: 3, col: 7,  ...lookup('DATASET')       },
-  { number: 9,  direction: 'down',   row: 5, col: 5,  ...lookup('OUTPUT')        },
-  { number: 10, direction: 'across', row: 6, col: 3,  ...lookup('NEURAL')        },
-];
+// Word lists per difficulty — these are passed to generateCrossword() at runtime.
+// To add a word to a puzzle: add it to wordBank.json first, then include its key here.
+export const wordListsByDifficulty = {
+  beginner: pick('beginner', [
+    'CHATBOT', 'HALLUCINATION', 'TRAINING', 'TOKEN', 'PROMPT',
+    'MODEL', 'FINETUNE', 'DATASET', 'OUTPUT', 'NEURAL',
+    'DEEPLEARNING', 'CONTEXTWINDOW',
+  ]),
+  intermediate: pick('intermediate', [
+    'TRANSFORMER', 'REGRESSION', 'SUPERVISED', 'PARAMETER', 'PRECISION',
+    'FEATURE', 'RECALL', 'EPOCH', 'LOSS',
+  ]),
+  advanced: pick('advanced', [
+    'NORMALIZATION', 'CONVERGENCE', 'REGULARIZATION', 'QUANTIZATION',
+    'ATTENTION', 'PERPLEXITY', 'VARIANCE', 'PRETRAINING',
+  ]),
+};

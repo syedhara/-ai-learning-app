@@ -283,6 +283,57 @@ body {
   line-height: 1.5;
 }
 
+/* ── Puzzle loading state ──────────────────────────────────────────────────── */
+.puzzle-generating {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 48px 0;
+  color: #666;
+  font-size: 15px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.generating-spinner {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  border: 3px solid #dde3ea;
+  border-top-color: #2980b9;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+/* ── Multi-word break markers (British crossword style) ─────────────────────── */
+/* A thick dark bar between two words that share a run of cells.                 */
+.word-break {
+  position: absolute;
+  background: #1a1a2e;
+  pointer-events: none;
+  z-index: 5;
+  border-radius: 2px;
+}
+
+/* Vertical bar on right edge — marks the end of the first word in an Across entry */
+.word-break-right {
+  right: -3px;
+  top: 4px;
+  width: 5px;
+  height: calc(100% - 8px);
+}
+
+/* Horizontal bar on bottom edge — marks the end of the first word in a Down entry */
+.word-break-bottom {
+  bottom: -3px;
+  left: 4px;
+  height: 5px;
+  width: calc(100% - 8px);
+}
+
 /* ── Mobile ────────────────────────────────────────────────────────────────── */
 @media (max-width: 680px) {
   .puzzle-layout {
