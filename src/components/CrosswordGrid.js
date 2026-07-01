@@ -4,12 +4,40 @@ import { adminConfig } from '../data/adminConfig';
 // Renders the crossword grid and the action bar below it.
 // All game state and logic live in useCrosswordGame — this component is purely visual.
 export default function CrosswordGrid({
-  solvedGrid, userGrid, getCellStatus, breakSet, gridRef,
-  onCellClick, onKeyDown, mode, onSwitchMode,
+  solvedGrid, userGrid, getCellStatus, breakSet, gridRef, inputRef,
+  onCellClick, onKeyDown, onInputChange, mode, onSwitchMode,
   onCheckAnswers, onRevealLetter, onRevealWord, onClear,
 }) {
   return (
-    <div>
+    <div style={{ position: 'relative' }}>
+      {/*
+        Hidden input — focused on cell tap so the mobile virtual keyboard pops up.
+        font-size:16px prevents iOS from zooming the page on focus.
+        Android types via onChange; desktop/iOS type via onKeyDown.
+      */}
+      <input
+        ref={inputRef}
+        type="text"
+        inputMode="text"
+        autoComplete="off"
+        autoCorrect="off"
+        autoCapitalize="off"
+        spellCheck={false}
+        aria-hidden="true"
+        tabIndex={-1}
+        onKeyDown={onKeyDown}
+        onChange={onInputChange}
+        style={{
+          position: 'absolute',
+          opacity: 0,
+          width: '1px',
+          height: '1px',
+          top: 0,
+          left: 0,
+          fontSize: '16px',
+          pointerEvents: 'none',
+        }}
+      />
       {/* ── Grid ── */}
       <div
         ref={gridRef}

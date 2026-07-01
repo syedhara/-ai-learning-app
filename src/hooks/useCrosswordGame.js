@@ -62,7 +62,12 @@ export function useCrosswordGame() {
   const [solved, setSolved]           = useState(false);
   const [mode, setMode]               = useState(getDefaultMode);
 
-  const gridRef = useRef(null);
+  const gridRef    = useRef(null);
+  const inputRef   = useRef(null);
+  // Tracks whether onKeyDown already processed a letter, so onChange doesn't double-fire it.
+  // Desktop/iOS: onKeyDown fires first and sets this true; onChange skips.
+  // Android: onKeyDown doesn't fire for IME letters, so onChange handles them.
+  const letterHandledRef = useRef(false);
 
   const acrossWords = useMemo(() => activeWords.filter(w => w.direction === 'across'), [activeWords]);
   const downWords   = useMemo(() => activeWords.filter(w => w.direction === 'down'),   [activeWords]);
@@ -111,9 +116,10 @@ export function useCrosswordGame() {
     return () => clearTimeout(t);
   }, [difficulty]);
 
-  // Focus the grid after generation so keyboard navigation works immediately
+  // Focus the hidden input after generation so keyboard navigation works immediately.
+  // The hidden input triggers the mobile virtual keyboard; desktop ignores the opacity:0 element.
   useEffect(() => {
-    if (!generating) gridRef.current?.focus();
+    if (!generating) inputRef.current?.focus();
   }, [generating]);
 
   // ── Game logic ─────────────────────────────────────────────────────────────
@@ -152,19 +158,20 @@ export function useCrosswordGame() {
       if (!cell.acrossNum) setDirection('down');
       else if (!cell.downNum) setDirection('across');
     }
-    gridRef.current?.focus();
+    inputRef.current?.focus();
   }
 
   function handleClueClick(wordDef) {
     setSelected({ row: wordDef.row, col: wordDef.col });
     setDirection(wordDef.direction);
-    gridRef.current?.focus();
+    inputRef.current?.focus();
   }
 
   function handleKeyDown(e) {
     const { row, col } = selected;
     if (/^[a-zA-Z]$/.test(e.key)) {
       e.preventDefault();
+      letterHandledRef.current = true; // tell onChange not to double-process this
       const newGrid = userGrid.map(r => [...r]);
       newGrid[row][col] = e.key.toUpperCase();
       setUserGrid(newGrid);
@@ -196,6 +203,27 @@ export function useCrosswordGame() {
     if (e.key === 'ArrowLeft')  { e.preventDefault(); setDirection('across'); jumpToNextCell(row, col, 0, -1); }
     if (e.key === 'ArrowDown')  { e.preventDefault(); setDirection('down');   jumpToNextCell(row, col,  1, 0); }
     if (e.key === 'ArrowUp')    { e.preventDefault(); setDirection('down');   jumpToNextCell(row, col, -1, 0); }
+  }
+
+  // Handles onChange on the hidden input — catches letter input on Android where
+  // the virtual keyboard doesn't fire reliable onKeyDown events for letter keys.
+  function handleInputChange(e) {
+    const val = e.target.value;
+    e.target.value = ''; // reset so next keystroke starts clean
+    if (letterHandledRef.current) {
+      letterHandledRef.current = false;
+      return; // already handled by onKeyDown (desktop / iOS)
+    }
+    const letter = val.replace(/[^a-zA-Z]/g, '').slice(-1).toUpperCase();
+    if (!letter) return;
+    const { row, col } = selected;
+    const newGrid = userGrid.map(r => [...r]);
+    newGrid[row][col] = letter;
+    setUserGrid(newGrid);
+    setChecked(false);
+    if (mode === 'liveFeedback' && isPuzzleSolved(newGrid)) setSolved(true);
+    else setSolved(false);
+    stepSelection(row, col, 1);
   }
 
   function stepSelection(row, col, delta) {
@@ -288,8 +316,8 @@ export function useCrosswordGame() {
     solved, mode, availableModes,
     switchDifficulty, switchMode,
     // Grid component props
-    solvedGrid, userGrid, getCellStatus, breakSet, gridRef,
-    handleCellClick, handleKeyDown,
+    solvedGrid, userGrid, getCellStatus, breakSet, gridRef, inputRef,
+    handleCellClick, handleKeyDown, handleInputChange,
     checkAnswers, revealLetter, revealWord, clearPuzzle,
     legendDescription: LEGEND_DESCRIPTIONS[mode],
     // Clues component props

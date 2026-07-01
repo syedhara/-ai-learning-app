@@ -61,8 +61,10 @@ export default function Crossword() {
                 getCellStatus={game.getCellStatus}
                 breakSet={game.breakSet}
                 gridRef={game.gridRef}
+                inputRef={game.inputRef}
                 onCellClick={game.handleCellClick}
                 onKeyDown={game.handleKeyDown}
+                onInputChange={game.handleInputChange}
                 mode={game.mode}
                 onSwitchMode={game.switchMode}
                 onCheckAnswers={game.checkAnswers}
