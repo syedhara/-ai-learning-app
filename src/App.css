@@ -7,52 +7,84 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #f0f4f8;
-  color: #222;
+  background: #f0eeff;   /* soft pastel lavender */
+  color: #2d2460;
   min-height: 100vh;
 }
 
 /* ── Page wrapper ──────────────────────────────────────────────────────────── */
 .App {
   min-height: 100vh;
-  padding: 24px 16px;
+  padding: 36px 24px 56px;
 }
 
 /* ── Crossword container ───────────────────────────────────────────────────── */
 .crossword-container {
-  max-width: 960px;
+  max-width: 980px;
   margin: 0 auto;
 }
 
+/* ── Title & tagline — centered ────────────────────────────────────────────── */
 .puzzle-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #1a1a2e;
-  margin-bottom: 4px;
+  font-size: 32px;
+  font-weight: 800;
+  color: #2d2460;
+  text-align: center;
+  letter-spacing: -0.3px;
+  margin-bottom: 6px;
 }
 
+.puzzle-tagline {
+  font-size: 15px;
+  color: #9b90d4;
+  font-weight: 400;
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+/* ── Level selector — centered ─────────────────────────────────────────────── */
+.level-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+/* ── Puzzle subtitle — centered ────────────────────────────────────────────── */
 .puzzle-subtitle {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 24px;
+  font-size: 13px;
+  color: #9b90d4;
+  text-align: center;
+  font-weight: 500;
+  margin-bottom: 16px;
+  letter-spacing: 0.02em;
 }
 
 /* ── Success banner ────────────────────────────────────────────────────────── */
 .success-banner {
-  background: #27ae60;
+  background: #7ec8a0;
   color: #fff;
   padding: 14px 20px;
-  border-radius: 8px;
-  font-size: 18px;
+  border-radius: 10px;
+  font-size: 17px;
   font-weight: 700;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   text-align: center;
+}
+
+/* ── Puzzle card — wraps grid + clues ──────────────────────────────────────── */
+.puzzle-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(101, 89, 167, 0.10);
+  padding: 28px;
 }
 
 /* ── Puzzle layout: grid left, clues right ─────────────────────────────────── */
 .puzzle-layout {
   display: flex;
-  gap: 32px;
+  gap: 36px;
   align-items: flex-start;
 }
 
@@ -62,6 +94,8 @@ body {
   gap: 1px;
   background: #555;
   border: 2px solid #555;
+  border-radius: 4px;
+  overflow: hidden;
   width: fit-content;
   cursor: default;
   user-select: none;
@@ -79,12 +113,12 @@ body {
   cursor: pointer;
 }
 
-.cell-black       { background: #444; cursor: default; }
+.cell-black       { background: #555; cursor: default; }
 .cell-white       { background: #fff; }
-.cell-selected    { background: #2980b9; }
-.cell-highlighted { background: #aed6f1; }
-.cell-correct     { background: #a9dfbf; }
-.cell-incorrect   { background: #f1948a; }
+.cell-selected    { background: #8577c8; }        /* pastel purple */
+.cell-highlighted { background: #ddd8f5; }        /* light lavender */
+.cell-correct     { background: #b8e4cc; }        /* pastel green */
+.cell-incorrect   { background: #f5b3be; }        /* pastel pink */
 
 .cell-number {
   position: absolute;
@@ -93,114 +127,100 @@ body {
   font-size: 9px;
   font-weight: 700;
   line-height: 1;
-  color: #333;
+  color: #555;
   pointer-events: none;
 }
 
-.cell-selected .cell-number {
-  color: #fff;
-}
+.cell-selected .cell-number { color: rgba(255,255,255,0.8); }
 
 .cell-letter {
   font-size: 18px;
   font-weight: 700;
-  color: #222;
+  color: #2d2460;
   line-height: 1;
   pointer-events: none;
 }
 
-.cell-selected .cell-letter {
-  color: #fff;
-}
+.cell-selected .cell-letter { color: #fff; }
 
-/* ── Buttons below the grid ────────────────────────────────────────────────── */
-.grid-buttons {
-  margin-top: 16px;
+/* ── Action bar — mode buttons + clear merged into one row below the grid ──── */
+.action-bar {
+  margin-top: 18px;
   display: flex;
-  gap: 12px;
-}
-
-.btn {
-  padding: 10px 22px;
-  font-size: 14px;
-  font-weight: 600;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.btn-check {
-  background: #2980b9;
-  color: #fff;
-}
-.btn-check:hover { background: #1f618d; }
-
-.btn-clear {
-  background: #e0e0e0;
-  color: #444;
-}
-.btn-clear:hover { background: #c8c8c8; }
-
-/* ── Clues panel ───────────────────────────────────────────────────────────── */
-.clues-panel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
-  max-height: 520px;
-  overflow-y: auto;
-}
-
-.clues-section h3 {
-  font-size: 14px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #555;
-  margin-bottom: 8px;
-  padding-bottom: 6px;
-  border-bottom: 2px solid #ddd;
-}
-
-.clue {
-  font-size: 14px;
-  line-height: 1.45;
-  padding: 5px 8px;
-  border-radius: 4px;
-  cursor: pointer;
-  color: #333;
-}
-
-.clue:hover {
-  background: #e8eef3;
-}
-
-.clue-active {
-  background: #d6eaf8;
-  color: #1a5276;
-  font-weight: 600;
-}
-
-.clue-number {
-  font-weight: 700;
-  color: #1a5276;
-  margin-right: 4px;
-}
-
-/* ── Mode selector ─────────────────────────────────────────────────────────── */
-.mode-selector {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 20px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
+/* Reveal sub-buttons — slide in below action bar when Reveal on Demand active */
+.reveal-sub-bar {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+/* ── Shared button base ────────────────────────────────────────────────────── */
+.btn {
+  padding: 9px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+}
+
+.btn:active { transform: scale(0.96); }
+
+/* Check Answers — soft blue-purple */
+.btn-check {
+  background: #b4a8e8;
+  color: #2d2460;
+}
+.btn-check:hover { background: #a496de; }
+
+/* Live Feedback — sage green, depressed look when active */
+.btn-live {
+  background: #a8d4c0;
+  color: #1a4035;
+}
+.btn-live:hover { background: #95c8b0; }
+.btn-live.btn-mode-active {
+  background: #70b09a;
+  color: #fff;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.18);
+}
+
+/* Reveal on Demand — soft rose-purple */
+.btn-reveal-toggle {
+  background: #e0b8d8;
+  color: #4a1a42;
+}
+.btn-reveal-toggle:hover { background: #d4a0cc; }
+.btn-reveal-toggle.btn-mode-active {
+  background: #c07aaa;
+  color: #fff;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.18);
+}
+
+/* Reveal sub-buttons — lighter rose */
+.btn-reveal-sub {
+  background: #f0d0e8;
+  color: #4a1a42;
+}
+.btn-reveal-sub:hover { background: #e8bede; }
+
+/* Clear — neutral lavender-gray */
+.btn-clear {
+  background: #ddd8f0;
+  color: #4a3f72;
+}
+.btn-clear:hover { background: #cec8e4; }
+
+/* ── Level / Mode selector buttons ────────────────────────────────────────── */
 .mode-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: #444;
+  font-size: 13px;
+  font-weight: 700;
+  color: #6d5fba;
   white-space: nowrap;
 }
 
@@ -211,76 +231,76 @@ body {
 }
 
 .mode-btn {
-  padding: 7px 16px;
+  padding: 7px 18px;
   font-size: 13px;
   font-weight: 600;
-  border: 2px solid #bbb;
+  border: 2px solid #c8bfea;
   border-radius: 20px;
   background: #fff;
-  color: #555;
+  color: #6d5fba;
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .mode-btn:hover {
-  border-color: #2980b9;
-  color: #2980b9;
+  border-color: #8577c8;
+  color: #5a4ba8;
+  background: #f7f4ff;
 }
 
 .mode-btn-active {
-  background: #2980b9;
-  border-color: #2980b9;
+  background: #8577c8;
+  border-color: #8577c8;
   color: #fff;
 }
 
-/* ── Reveal button ──────────────────────────────────────────────────────────── */
-.btn-reveal {
-  background: #8e44ad;
-  color: #fff;
-}
-.btn-reveal:hover { background: #6c3483; }
-
-/* ── Legend ─────────────────────────────────────────────────────────────────── */
-.legend {
-  margin-top: 20px;
-  padding: 14px 16px;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  max-width: 510px;
-}
-
-.legend-swatches {
+/* ── Clues panel ───────────────────────────────────────────────────────────── */
+.clues-panel {
+  flex: 1;
   display: flex;
-  gap: 16px;
-  margin-bottom: 8px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 28px;
+  max-height: 520px;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: #444;
+.clues-panel::-webkit-scrollbar { width: 4px; }
+.clues-panel::-webkit-scrollbar-track { background: transparent; }
+.clues-panel::-webkit-scrollbar-thumb { background: #c8bfea; border-radius: 2px; }
+
+.clues-section h3 {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #8577c8;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #e8e3f7;
 }
 
-.legend-swatch {
-  display: inline-block;
-  width: 18px;
-  height: 18px;
-  border-radius: 3px;
-  border: 1px solid #ccc;
-}
-
-.swatch-correct   { background: #a9dfbf; }
-.swatch-incorrect { background: #f1948a; }
-.swatch-white     { background: #fff; }
-
-.legend-description {
-  font-size: 13px;
-  color: #666;
+.clue {
+  font-size: 14px;
   line-height: 1.5;
+  padding: 5px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #3d3271;
+}
+
+.clue:hover { background: #f4f0ff; }
+
+.clue-active {
+  background: #eeebff;
+  color: #2d2460;
+  font-weight: 600;
+}
+
+.clue-number {
+  font-weight: 800;
+  color: #8577c8;
+  margin-right: 4px;
 }
 
 /* ── Puzzle loading state ──────────────────────────────────────────────────── */
@@ -288,9 +308,12 @@ body {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 48px 0;
-  color: #666;
+  padding: 48px 28px;
+  color: #9b90d4;
   font-size: 15px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(101, 89, 167, 0.10);
 }
 
 @keyframes spin {
@@ -301,24 +324,22 @@ body {
   display: inline-block;
   width: 28px;
   height: 28px;
-  border: 3px solid #dde3ea;
-  border-top-color: #2980b9;
+  border: 3px solid #e0daf7;
+  border-top-color: #8577c8;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
   flex-shrink: 0;
 }
 
-/* ── Multi-word break markers (British crossword style) ─────────────────────── */
-/* A thick dark bar between two words that share a run of cells.                 */
+/* ── Multi-word break markers (British crossword style) ──────────────────────*/
 .word-break {
   position: absolute;
-  background: #1a1a2e;
+  background: #2d2460;
   pointer-events: none;
   z-index: 5;
   border-radius: 2px;
 }
 
-/* Vertical bar on right edge — marks the end of the first word in an Across entry */
 .word-break-right {
   right: -3px;
   top: 4px;
@@ -326,7 +347,6 @@ body {
   height: calc(100% - 8px);
 }
 
-/* Horizontal bar on bottom edge — marks the end of the first word in a Down entry */
 .word-break-bottom {
   bottom: -3px;
   left: 4px;
@@ -335,20 +355,20 @@ body {
 }
 
 /* ── Mobile ────────────────────────────────────────────────────────────────── */
-@media (max-width: 680px) {
-  .puzzle-layout {
-    flex-direction: column;
-  }
+@media (max-width: 720px) {
+  .App { padding: 20px 12px 40px; }
 
-  .cell {
-    width: 26px;
-    height: 26px;
-  }
+  .puzzle-title  { font-size: 24px; }
+  .puzzle-card   { padding: 16px; }
 
+  .puzzle-layout { flex-direction: column; }
+
+  .cell { width: 26px; height: 26px; }
   .cell-letter { font-size: 13px; }
   .cell-number { font-size: 7px; }
 
-  .clues-panel {
-    max-height: none;
-  }
+  .clues-panel { max-height: none; }
+
+  .action-bar { gap: 8px; }
+  .btn { padding: 8px 14px; font-size: 12px; }
 }

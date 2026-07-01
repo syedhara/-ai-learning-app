@@ -1,13 +1,12 @@
 import { GRID_ROWS, GRID_COLS } from '../data/puzzleData';
 import { adminConfig } from '../data/adminConfig';
 
-// Renders the crossword grid, the action buttons below it, and the legend.
+// Renders the crossword grid and the action bar below it.
 // All game state and logic live in useCrosswordGame — this component is purely visual.
 export default function CrosswordGrid({
   solvedGrid, userGrid, getCellStatus, breakSet, gridRef,
-  onCellClick, onKeyDown, mode,
+  onCellClick, onKeyDown, mode, onSwitchMode,
   onCheckAnswers, onRevealLetter, onRevealWord, onClear,
-  legendDescription,
 }) {
   return (
     <div>
@@ -40,29 +39,43 @@ export default function CrosswordGrid({
         )}
       </div>
 
-      {/* ── Action buttons ── */}
-      <div className="grid-buttons">
-        {(mode === 'checkAnswers' || mode === 'reveal') && (
-          <button className="btn btn-check" onClick={onCheckAnswers}>Check Answers</button>
+      {/* ── Action bar: mode buttons + clear in one row ── */}
+      <div className="action-bar">
+        {adminConfig.allowCheckAnswers && (
+          <button className="btn btn-check" onClick={onCheckAnswers}>
+            Check Answers
+          </button>
         )}
-        {mode === 'reveal' && adminConfig.allowRevealLetter && (
-          <button className="btn btn-reveal" onClick={onRevealLetter}>Reveal Letter</button>
+        {adminConfig.allowLiveFeedback && (
+          <button
+            className={`btn btn-live${mode === 'liveFeedback' ? ' btn-mode-active' : ''}`}
+            onClick={() => onSwitchMode(mode === 'liveFeedback' ? 'checkAnswers' : 'liveFeedback')}
+          >
+            Live Feedback
+          </button>
         )}
-        {mode === 'reveal' && adminConfig.allowRevealWord && (
-          <button className="btn btn-reveal" onClick={onRevealWord}>Reveal Word</button>
+        {(adminConfig.allowRevealLetter || adminConfig.allowRevealWord) && (
+          <button
+            className={`btn btn-reveal-toggle${mode === 'reveal' ? ' btn-mode-active' : ''}`}
+            onClick={() => onSwitchMode(mode === 'reveal' ? 'checkAnswers' : 'reveal')}
+          >
+            Reveal on Demand
+          </button>
         )}
         <button className="btn btn-clear" onClick={onClear}>Clear</button>
       </div>
 
-      {/* ── Legend ── */}
-      <div className="legend">
-        <div className="legend-swatches">
-          <span className="legend-item"><span className="legend-swatch swatch-correct" /> Correct</span>
-          <span className="legend-item"><span className="legend-swatch swatch-incorrect" /> Wrong</span>
-          <span className="legend-item"><span className="legend-swatch swatch-white" /> Not checked yet</span>
+      {/* ── Reveal sub-buttons — appear when Reveal on Demand is active ── */}
+      {mode === 'reveal' && (
+        <div className="reveal-sub-bar">
+          {adminConfig.allowRevealLetter && (
+            <button className="btn btn-reveal-sub" onClick={onRevealLetter}>Reveal Letter</button>
+          )}
+          {adminConfig.allowRevealWord && (
+            <button className="btn btn-reveal-sub" onClick={onRevealWord}>Reveal Word</button>
+          )}
         </div>
-        <p className="legend-description">{legendDescription}</p>
-      </div>
+      )}
     </div>
   );
 }

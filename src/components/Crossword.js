@@ -1,5 +1,4 @@
 import { useCrosswordGame } from '../hooks/useCrosswordGame';
-import { adminConfig } from '../data/adminConfig';
 import CrosswordGrid from './CrosswordGrid';
 import CrosswordClues from './CrosswordClues';
 
@@ -17,9 +16,10 @@ export default function Crossword() {
   return (
     <div className="crossword-container">
       <h1 className="puzzle-title">Learn AI · Crossword</h1>
+      <p className="puzzle-tagline">Test your AI vocabulary, one clue at a time</p>
 
-      {/* ── Difficulty selector ── */}
-      <div className="mode-selector">
+      {/* ── Level selector (centered) ── */}
+      <div className="level-selector">
         <span className="mode-label">Level:</span>
         <div className="mode-buttons">
           {Object.keys(DIFFICULTY_LABELS).map(level => (
@@ -48,66 +48,36 @@ export default function Crossword() {
         </div>
       ) : (
         <>
-          {/* ── Hint mode selector (hidden if only one mode available) ── */}
-          {game.availableModes.length > 1 && (
-            <div className="mode-selector">
-              <span className="mode-label">How do you want to play?</span>
-              <div className="mode-buttons">
-                {adminConfig.allowCheckAnswers && (
-                  <button
-                    className={`mode-btn ${game.mode === 'checkAnswers' ? 'mode-btn-active' : ''}`}
-                    onClick={() => game.switchMode('checkAnswers')}
-                  >
-                    Check Answers
-                  </button>
-                )}
-                {adminConfig.allowLiveFeedback && (
-                  <button
-                    className={`mode-btn ${game.mode === 'liveFeedback' ? 'mode-btn-active' : ''}`}
-                    onClick={() => game.switchMode('liveFeedback')}
-                  >
-                    Live Feedback
-                  </button>
-                )}
-                {(adminConfig.allowRevealLetter || adminConfig.allowRevealWord) && (
-                  <button
-                    className={`mode-btn ${game.mode === 'reveal' ? 'mode-btn-active' : ''}`}
-                    onClick={() => game.switchMode('reveal')}
-                  >
-                    Reveal on Demand
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
-
           {game.solved && (
             <div className="success-banner">Congratulations! You solved the puzzle!</div>
           )}
 
-          <div className="puzzle-layout">
-            <CrosswordGrid
-              solvedGrid={game.solvedGrid}
-              userGrid={game.userGrid}
-              getCellStatus={game.getCellStatus}
-              breakSet={game.breakSet}
-              gridRef={game.gridRef}
-              onCellClick={game.handleCellClick}
-              onKeyDown={game.handleKeyDown}
-              mode={game.mode}
-              onCheckAnswers={game.checkAnswers}
-              onRevealLetter={game.revealLetter}
-              onRevealWord={game.revealWord}
-              onClear={game.clearPuzzle}
-              legendDescription={game.legendDescription}
-            />
-            <CrosswordClues
-              acrossWords={game.acrossWords}
-              downWords={game.downWords}
-              activeClueNum={game.activeClueNum}
-              direction={game.direction}
-              onClueClick={game.handleClueClick}
-            />
+          {/* ── Puzzle card: grid + clues ── */}
+          <div className="puzzle-card">
+            <div className="puzzle-layout">
+              <CrosswordGrid
+                solvedGrid={game.solvedGrid}
+                userGrid={game.userGrid}
+                getCellStatus={game.getCellStatus}
+                breakSet={game.breakSet}
+                gridRef={game.gridRef}
+                onCellClick={game.handleCellClick}
+                onKeyDown={game.handleKeyDown}
+                mode={game.mode}
+                onSwitchMode={game.switchMode}
+                onCheckAnswers={game.checkAnswers}
+                onRevealLetter={game.revealLetter}
+                onRevealWord={game.revealWord}
+                onClear={game.clearPuzzle}
+              />
+              <CrosswordClues
+                acrossWords={game.acrossWords}
+                downWords={game.downWords}
+                activeClueNum={game.activeClueNum}
+                direction={game.direction}
+                onClueClick={game.handleClueClick}
+              />
+            </div>
           </div>
         </>
       )}
