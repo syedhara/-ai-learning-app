@@ -54,12 +54,23 @@
 
 ---
 
-## Active Sprint — Sprint 2 ✅ COMPLETE
+## First Edition — SHIPPED ✅ (2026-06-30)
 
-- [x] **Difficulty level selector** — Beginner / Intermediate / Advanced toggle; runtime generator runs on each switch
-- [x] **Multi-word terms** — DEEPLEARNING + CONTEXTWINDOW in wordBank.json with breakAfter; thick break-marker bar on grid; clue says "(2 words)"
-- [x] **Runtime generation (Option 2)** — grid generated in browser on page load; no more hardcoded positions in puzzleData.js
-- [x] **Code split** — Crossword.js split into 4 focused files; File Map updated above
+Sprint 2 and styling complete. Live on Vercel. Sri is testing.
+
+**What's in the first edition:**
+- Difficulty selector (Beginner / Intermediate / Advanced), runtime grid generation
+- Multi-word terms (DEEP LEARNING, CONTEXT WINDOW) with break markers
+- Pastel green design — centered title/tagline, action bar below grid, legend removed
+- Code split: Crossword.js → 4 focused files + 1 hook
+
+---
+
+## Next Sprint — Sprint 4 (planned)
+
+- [ ] **Login page** — user authentication before accessing the puzzle
+- [ ] **Admin section** — separate page to configure modes/settings (replacing hardcoded adminConfig.js)
+- [ ] Additional items TBD after Sri's testing
 
 ---
 
@@ -87,8 +98,8 @@
 
 - **Mobile fix** — UI breaks on Samsung Galaxy S26 Ultra; keyboard doesn't pop up on cell tap
 - **Reveal limits** — cap how many letters/words can be revealed per session
-- **User accounts** — login, progress tracking
 - **Topic selector** — let user pick a topic (LLMs, Prompts, etc.) not just difficulty
+- **Expert level** — needs larger grid; REINFORCEMENT and HYPERPARAMETER reserved for it
 
 ---
 
