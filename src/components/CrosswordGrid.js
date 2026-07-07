@@ -92,14 +92,14 @@ export default function CrosswordGrid({
           </button>
         )}
         <button className="btn btn-clear" onClick={onClear}>Clear</button>
-        {adminConfig.prefillPercentage > 0 && !helpUsed && (
-          <button className="btn btn-need-help" onClick={onNeedHelp}>Need Help</button>
-        )}
       </div>
 
-      {/* ── Caption under "Need Help" — explains what the button does ── */}
+      {/* ── Need Help — own row so it doesn't crowd/shrink the buttons above ── */}
       {adminConfig.prefillPercentage > 0 && !helpUsed && (
-        <p className="need-help-caption">Reveal some random letters</p>
+        <div className="need-help-bar">
+          <button className="btn btn-need-help" onClick={onNeedHelp}>Need Help</button>
+          <span className="need-help-caption">Reveal some random letters</span>
+        </div>
       )}
 
       {/* ── Reveal sub-buttons — appear when Reveal on Demand is active ── */}

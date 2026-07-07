@@ -225,11 +225,19 @@ body {
 }
 .btn-need-help:hover { background: #eac274; }
 
-/* Caption under the Need Help button, explaining what it does */
+/* Need Help — own row below the action bar, so it doesn't crowd/shrink those buttons */
+.need-help-bar {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .need-help-caption {
   font-size: 12px;
   color: #5bab88;
-  margin: 6px 0 0;
+  margin: 0;
 }
 
 /* ── Level / Mode selector buttons ────────────────────────────────────────── */
