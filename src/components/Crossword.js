@@ -59,6 +59,7 @@ export default function Crossword() {
                 solvedGrid={game.solvedGrid}
                 userGrid={game.userGrid}
                 getCellStatus={game.getCellStatus}
+                isPrefilled={game.isPrefilled}
                 breakSet={game.breakSet}
                 gridRef={game.gridRef}
                 inputRef={game.inputRef}
@@ -71,6 +72,8 @@ export default function Crossword() {
                 onRevealLetter={game.revealLetter}
                 onRevealWord={game.revealWord}
                 onClear={game.clearPuzzle}
+                onNeedHelp={game.needHelp}
+                helpUsed={game.helpUsed}
               />
               <CrosswordClues
                 acrossWords={game.acrossWords}

@@ -115,6 +115,7 @@ body {
 
 .cell-black       { background: #555; cursor: default; }
 .cell-white       { background: #fff; }
+.cell-prefilled   { background: #e7ecef; cursor: default; }  /* free starting letter, locked */
 .cell-selected    { background: #4aab80; }        /* medium teal-green */
 .cell-highlighted { background: #c0ecd8; }        /* light mint */
 .cell-correct     { background: #b8e4cc; }        /* pastel green */
@@ -141,6 +142,7 @@ body {
   pointer-events: none;
 }
 
+.cell-prefilled .cell-letter { color: #7a8a99; }  /* muted — signals "given", not typed by the user */
 .cell-selected .cell-letter { color: #fff; }
 
 /* ── Action bar — mode buttons + clear merged into one row below the grid ──── */
@@ -215,6 +217,20 @@ body {
   color: #2a4838;
 }
 .btn-clear:hover { background: #bcdec8; }
+
+/* Need Help — warm amber so it stands out from the green mode buttons */
+.btn-need-help {
+  background: #f0d090;
+  color: #5a3d0a;
+}
+.btn-need-help:hover { background: #eac274; }
+
+/* Caption under the Need Help button, explaining what it does */
+.need-help-caption {
+  font-size: 12px;
+  color: #5bab88;
+  margin: 6px 0 0;
+}
 
 /* ── Level / Mode selector buttons ────────────────────────────────────────── */
 .mode-label {

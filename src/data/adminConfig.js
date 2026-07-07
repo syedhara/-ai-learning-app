@@ -22,4 +22,10 @@ export const adminConfig = {
   // Options: 'checkAnswers' | 'liveFeedback' | 'reveal'
   defaultMode: 'checkAnswers',
 
+  // % of grid cells revealed when the user clicks "Need Help" (one time per
+  // puzzle), like a Sudoku starting board. The grid loads empty — this is
+  // opt-in, not automatic. Revealed letters are locked — can't be typed over.
+  // Set to 0 to hide the Need Help button entirely.
+  prefillPercentage: 12,
+
 };

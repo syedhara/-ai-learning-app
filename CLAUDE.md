@@ -68,7 +68,12 @@ Sprint 2 and styling complete. Live on Vercel. Sri is testing.
 
 ## Next Sprint — Sprint 4 (planned)
 
-- [ ] **Login page** — user authentication before accessing the puzzle
+- [ ] **App flow / navigation restructure** — Login page (stub for now, real auth later) → Landing page → Puzzle page
+  - Landing page becomes the hub: starts with just a link to the Crossword puzzle, more links/features added over time
+  - Needs routing added (e.g. react-router-dom) — app currently has no routing, single component tree
+  - Also ties into the **Practice by Topic** idea: a page where Sri picks Subject + Difficulty and gets a puzzle from just that slice (separate from the main puzzle page's difficulty-only selector)
+  - Planned start: late Sunday or Monday (~2026-07-05 / 07-06)
+- [ ] **Login page** — user authentication before accessing the puzzle (can stay a stub route until real auth is needed)
 - [ ] **Admin section** — separate page to configure modes/settings (replacing hardcoded adminConfig.js)
 - [ ] Additional items TBD after Sri's testing
 
@@ -80,8 +85,10 @@ Sprint 2 and styling complete. Live on Vercel. Sri is testing.
 - 3 hint modes: Check Answers / Live Feedback / Reveal on Demand (Reveal Letter + Reveal Word)
 - Admin config (`adminConfig.js`) to enable/disable modes per audience
 - Colour-coded legend below grid
-- wordBank.json — 45 terms: 18 beginner, 17 intermediate, 10 advanced
+- wordBank.json — 79 terms: 29 beginner, 30 intermediate, 20 advanced (goal: grow to 300); each word tagged with `subject` for future topic filtering
+- Difficulty selection persists across browser refresh (localStorage)
 - Title: "Learn AI · Crossword"
+- "Need Help" button (opt-in, one-time per puzzle) reveals 12% of the grid as locked, Sudoku-style starting letters — helps first-timers get a foothold on unfamiliar terms. See PRODUCT.md.
 
 ---
 
@@ -98,7 +105,7 @@ Sprint 2 and styling complete. Live on Vercel. Sri is testing.
 
 - **Mobile fix** — UI breaks on Samsung Galaxy S26 Ultra; keyboard doesn't pop up on cell tap
 - **Reveal limits** — cap how many letters/words can be revealed per session
-- **Topic selector** — let user pick a topic (LLMs, Prompts, etc.) not just difficulty
+- **Topic selector** — superseded by the Practice by Topic page idea above (see Sprint 4) — wordBank.json words already carry a `subject` tag (LLM, Prompt Engineering, Machine Learning, NLP, AI Ethics & Safety, AI Agents) ready for this
 - **Expert level** — needs larger grid; REINFORCEMENT and HYPERPARAMETER reserved for it
 
 ---

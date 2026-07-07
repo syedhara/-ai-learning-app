@@ -28,6 +28,31 @@ function buildSolvedGrid(wordList) {
   return grid;
 }
 
+// Every filled cell across all placed words, as "row-col" keys.
+function collectFilledCells(wordList) {
+  const set = new Set();
+  wordList.forEach(({ word, direction, row, col }) => {
+    for (let i = 0; i < word.length; i++) {
+      const r = direction === 'down' ? row + i : row;
+      const c = direction === 'across' ? col + i : col;
+      set.add(`${r}-${c}`);
+    }
+  });
+  return [...set];
+}
+
+// Randomly picks `percentage`% of the given cell keys — the Sudoku-style
+// starting letters the user gets for free.
+function pickPrefilledCells(cellKeys, percentage) {
+  const shuffled = [...cellKeys];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  const count = Math.round(shuffled.length * percentage / 100);
+  return new Set(shuffled.slice(0, count));
+}
+
 function getDefaultMode() {
   const d = adminConfig.defaultMode;
   if (d === 'checkAnswers' && adminConfig.allowCheckAnswers) return 'checkAnswers';
@@ -46,8 +71,15 @@ const LEGEND_DESCRIPTIONS = {
 
 // ── Custom hook — encapsulates all crossword state and game logic ──────────────
 // Returns everything Crossword.js needs to pass down to its child components.
+const DIFFICULTY_STORAGE_KEY = 'crossword.difficulty';
+
+function getStoredDifficulty() {
+  const stored = localStorage.getItem(DIFFICULTY_STORAGE_KEY);
+  return wordListsByDifficulty[stored] ? stored : 'beginner';
+}
+
 export function useCrosswordGame() {
-  const [difficulty, setDifficulty]   = useState('beginner');
+  const [difficulty, setDifficulty]   = useState(getStoredDifficulty);
   const [generating, setGenerating]   = useState(true);
   const [activeWords, setActiveWords] = useState([]);
   const [solvedGrid, setSolvedGrid]   = useState(() =>
@@ -56,11 +88,14 @@ export function useCrosswordGame() {
   const [userGrid, setUserGrid]       = useState(() =>
     Array.from({ length: GRID_ROWS }, () => Array(GRID_COLS).fill(''))
   );
+  const [prefilledCells, setPrefilledCells] = useState(() => new Set());
   const [selected, setSelected]       = useState({ row: 0, col: 0 });
   const [direction, setDirection]     = useState('across');
   const [checked, setChecked]         = useState(false);
   const [solved, setSolved]           = useState(false);
   const [mode, setMode]               = useState(getDefaultMode);
+  // "Need Help" reveals a batch of random letters once per puzzle — starts unused each time a new puzzle loads.
+  const [helpUsed, setHelpUsed]       = useState(false);
 
   const gridRef    = useRef(null);
   const inputRef   = useRef(null);
@@ -97,6 +132,8 @@ export function useCrosswordGame() {
     setDirection('across');
     setChecked(false);
     setSolved(false);
+    setHelpUsed(false);
+    setPrefilledCells(new Set());
 
     // setTimeout(0) lets React paint the loading spinner before the generator
     // runs its synchronous search.
@@ -104,7 +141,9 @@ export function useCrosswordGame() {
       const wordList = wordListsByDifficulty[difficulty];
       const { placed } = generateCrossword(wordList, 500);
       setActiveWords(placed);
-      setSolvedGrid(buildSolvedGrid(placed));
+      const solved = buildSolvedGrid(placed);
+      setSolvedGrid(solved);
+
       const firstAcross = placed.find(w => w.direction === 'across');
       if (firstAcross) {
         setSelected({ row: firstAcross.row, col: firstAcross.col });
@@ -135,7 +174,14 @@ export function useCrosswordGame() {
   }
 
   function switchDifficulty(newDifficulty) {
-    if (newDifficulty !== difficulty) setDifficulty(newDifficulty);
+    if (newDifficulty !== difficulty) {
+      setDifficulty(newDifficulty);
+      localStorage.setItem(DIFFICULTY_STORAGE_KEY, newDifficulty);
+    }
+  }
+
+  function isPrefilled(row, col) {
+    return prefilledCells.has(`${row}-${col}`);
   }
 
   function switchMode(newMode) {
@@ -172,6 +218,7 @@ export function useCrosswordGame() {
     if (/^[a-zA-Z]$/.test(e.key)) {
       e.preventDefault();
       letterHandledRef.current = true; // tell onChange not to double-process this
+      if (isPrefilled(row, col)) { stepSelection(row, col, 1); return; } // locked — just move on
       const newGrid = userGrid.map(r => [...r]);
       newGrid[row][col] = e.key.toUpperCase();
       setUserGrid(newGrid);
@@ -184,13 +231,13 @@ export function useCrosswordGame() {
     if (e.key === 'Backspace') {
       e.preventDefault();
       const newGrid = userGrid.map(r => [...r]);
-      if (newGrid[row][col]) {
+      if (newGrid[row][col] && !isPrefilled(row, col)) {
         newGrid[row][col] = '';
       } else {
         const pr = direction === 'down'   ? row - 1 : row;
         const pc = direction === 'across' ? col - 1 : col;
         if (pr >= 0 && pc >= 0 && solvedGrid[pr]?.[pc]) {
-          newGrid[pr][pc] = '';
+          if (!isPrefilled(pr, pc)) newGrid[pr][pc] = '';
           setSelected({ row: pr, col: pc });
         }
       }
@@ -217,6 +264,7 @@ export function useCrosswordGame() {
     const letter = val.replace(/[^a-zA-Z]/g, '').slice(-1).toUpperCase();
     if (!letter) return;
     const { row, col } = selected;
+    if (isPrefilled(row, col)) { stepSelection(row, col, 1); return; } // locked — just move on
     const newGrid = userGrid.map(r => [...r]);
     newGrid[row][col] = letter;
     setUserGrid(newGrid);
@@ -273,8 +321,33 @@ export function useCrosswordGame() {
     if (isPuzzleSolved(newGrid)) setSolved(true);
   }
 
+  // "Need Help" — one-time reveal of a random batch of letters (Sudoku-style
+  // starting hints), given only when the user asks for it instead of automatically.
+  function needHelp() {
+    if (helpUsed) return;
+    setHelpUsed(true);
+    const blankCells = collectFilledCells(activeWords).filter(key => {
+      const [r, c] = key.split('-').map(Number);
+      return !userGrid[r][c];
+    });
+    const revealed = pickPrefilledCells(blankCells, adminConfig.prefillPercentage);
+    setPrefilledCells(prev => new Set([...prev, ...revealed]));
+    const newGrid = userGrid.map(r => [...r]);
+    revealed.forEach(key => {
+      const [r, c] = key.split('-').map(Number);
+      newGrid[r][c] = solvedGrid[r][c].letter;
+    });
+    setUserGrid(newGrid);
+    if (isPuzzleSolved(newGrid)) setSolved(true);
+  }
+
   function clearPuzzle() {
-    setUserGrid(Array.from({ length: GRID_ROWS }, () => Array(GRID_COLS).fill('')));
+    const cleared = Array.from({ length: GRID_ROWS }, () => Array(GRID_COLS).fill(''));
+    prefilledCells.forEach(key => {
+      const [r, c] = key.split('-').map(Number);
+      cleared[r][c] = solvedGrid[r][c].letter;
+    });
+    setUserGrid(cleared);
     setChecked(false);
     setSolved(false);
   }
@@ -316,9 +389,9 @@ export function useCrosswordGame() {
     solved, mode, availableModes,
     switchDifficulty, switchMode,
     // Grid component props
-    solvedGrid, userGrid, getCellStatus, breakSet, gridRef, inputRef,
+    solvedGrid, userGrid, getCellStatus, isPrefilled, breakSet, gridRef, inputRef,
     handleCellClick, handleKeyDown, handleInputChange,
-    checkAnswers, revealLetter, revealWord, clearPuzzle,
+    checkAnswers, revealLetter, revealWord, clearPuzzle, needHelp, helpUsed,
     legendDescription: LEGEND_DESCRIPTIONS[mode],
     // Clues component props
     acrossWords, downWords, activeClueNum,

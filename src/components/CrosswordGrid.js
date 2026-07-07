@@ -4,9 +4,9 @@ import { adminConfig } from '../data/adminConfig';
 // Renders the crossword grid and the action bar below it.
 // All game state and logic live in useCrosswordGame — this component is purely visual.
 export default function CrosswordGrid({
-  solvedGrid, userGrid, getCellStatus, breakSet, gridRef, inputRef,
+  solvedGrid, userGrid, getCellStatus, isPrefilled, breakSet, gridRef, inputRef,
   onCellClick, onKeyDown, onInputChange, mode, onSwitchMode,
-  onCheckAnswers, onRevealLetter, onRevealWord, onClear,
+  onCheckAnswers, onRevealLetter, onRevealWord, onClear, onNeedHelp, helpUsed,
 }) {
   return (
     <div style={{ position: 'relative' }}>
@@ -48,13 +48,14 @@ export default function CrosswordGrid({
       >
         {Array.from({ length: GRID_ROWS }, (_, r) =>
           Array.from({ length: GRID_COLS }, (_, c) => {
-            const status = getCellStatus(r, c);
-            const cell   = solvedGrid[r][c];
-            const marker = breakSet[`${r}-${c}`];
+            const status    = getCellStatus(r, c);
+            const cell      = solvedGrid[r][c];
+            const marker    = breakSet[`${r}-${c}`];
+            const prefilled = isPrefilled(r, c);
             return (
               <div
                 key={`${r}-${c}`}
-                className={`cell cell-${status}`}
+                className={`cell cell-${status}${prefilled ? ' cell-prefilled' : ''}`}
                 onClick={() => onCellClick(r, c)}
               >
                 {cell?.number && <span className="cell-number">{cell.number}</span>}
@@ -91,7 +92,15 @@ export default function CrosswordGrid({
           </button>
         )}
         <button className="btn btn-clear" onClick={onClear}>Clear</button>
+        {adminConfig.prefillPercentage > 0 && !helpUsed && (
+          <button className="btn btn-need-help" onClick={onNeedHelp}>Need Help</button>
+        )}
       </div>
+
+      {/* ── Caption under "Need Help" — explains what the button does ── */}
+      {adminConfig.prefillPercentage > 0 && !helpUsed && (
+        <p className="need-help-caption">Reveal some random letters</p>
+      )}
 
       {/* ── Reveal sub-buttons — appear when Reveal on Demand is active ── */}
       {mode === 'reveal' && (

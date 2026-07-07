@@ -62,6 +62,19 @@ Two sub-options:
 
 ---
 
+### Need Help — On-Demand Starting Letters (Sudoku-style hints)
+
+- Grid loads with **no letters revealed**. A "Need Help" button in the action bar (caption: "Reveal some random letters") lets the user opt in
+- Clicking it once reveals `adminConfig.prefillPercentage` (default 12%) of the grid's still-blank filled cells, randomly chosen
+- One-time per puzzle — the button disappears after use; a new puzzle (difficulty switch or reload) resets it
+- Revealed cells are locked — can't be typed over or backspaced — and shown with a muted grey background/letter so they read as "given," not "yours"
+- Clicking a revealed cell still selects it (so its clue is visible); typing on it just advances the cursor
+- "Clear" restores revealed letters instead of wiping them
+- Distribution is pure random across the whole grid (not guaranteed per-word), so by chance some words may get zero free letters and others may get several
+- Goal: give first-time users (unfamiliar with AI vocabulary) a toehold without a "cheat sheet" they could just read off, unlike flashing the word list beforehand — but only when they ask for it, not forced on every puzzle
+
+---
+
 ### Admin Controls
 
 Stored in `src/data/adminConfig.js`. Controls which modes are available app-wide.
@@ -129,6 +142,17 @@ Chronological record of decisions made and why.
 - A visual break marker will appear between the two words (British crossword style).
 - The clue will indicate "(2 words)" so the user knows to expect two words.
 - First two terms to implement: MACHINE LEARNING + DEEP LEARNING (most familiar to beginners).
+
+**2026-07-07 — Pre-filled starting letters**
+- Testers unfamiliar with AI terms got stuck with zero footholds under "Check Answers" mode and gave up. Reason: crossword hint modes assume you already know the word and need to recall it — new vocabulary has nothing to recall.
+- Considered flashing the word list before play, rejected: users could just keep re-reading it as a cheat sheet instead of trying to recall.
+- Chose Sudoku-style random pre-filled letters (12% of grid, locked) instead — gives a foothold while still requiring active recall for the rest.
+- Chose pure random distribution over "1 guaranteed letter per word" for v1 — simpler, can revisit if some words end up with zero hints too often in practice.
+
+**2026-07-07 — Made pre-fill opt-in ("Need Help" button)**
+- After testing the auto pre-filled grid, decided letters showing up automatically felt like it undercut the puzzle before the user even started.
+- Changed to opt-in: grid loads empty, user clicks "Need Help" (caption: "Reveal some random letters") to get the same 12% random locked reveal, once per puzzle.
+- Kept everything else about the mechanic (locked cells, muted styling, Clear restores them) — only the trigger moved from automatic to user-initiated.
 
 **2026-06-29 — Token efficiency & file strategy**
 - Agreed to keep CLAUDE.md lean (working guide, ~90 lines) and PRODUCT.md as the permanent record.
