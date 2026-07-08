@@ -24,6 +24,24 @@ body {
   margin: 0 auto;
 }
 
+/* ── Simple centered pages (Login, Landing) ──────────────────────────────────── */
+.page-container {
+  max-width: 420px;
+  margin: 120px auto 0;
+  text-align: center;
+}
+
+/* Big pill button/link shared by Login's Continue and Landing's puzzle link */
+.btn-primary {
+  display: inline-block;
+  padding: 12px 28px;
+  font-size: 15px;
+  text-decoration: none;
+  background: #5aaa5a;
+  color: #fff;
+}
+.btn-primary:hover { background: #4a9a4a; }
+
 /* ── Title & tagline — centered ────────────────────────────────────────────── */
 .puzzle-title {
   font-size: 32px;

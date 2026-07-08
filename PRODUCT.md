@@ -154,6 +154,13 @@ Chronological record of decisions made and why.
 - Changed to opt-in: grid loads empty, user clicks "Need Help" (caption: "Reveal some random letters") to get the same 12% random locked reveal, once per puzzle.
 - Kept everything else about the mechanic (locked cells, muted styling, Clear restores them) — only the trigger moved from automatic to user-initiated.
 
+**2026-07-07 — Sprint 4: added routing (Login → Landing → Puzzle)**
+- App had no routing — App.js rendered the Crossword directly. Added react-router-dom with 3 routes so future pages (Admin section, Practice by Topic) have somewhere to live.
+- Started with the navigation restructure ahead of the Login page and Admin section items, since both depend on routing existing first.
+- Login page is a stub: no real auth, just a Continue button to `/home`. Landing page (`/home`) is the hub with a single "Crossword Puzzle" link for now.
+- Tried react-router-dom v7 first — its package.json `exports` map isn't resolvable by CRA5's Jest resolver (`Cannot find module 'react-router/dom'`), and CRA doesn't expose a way to override Jest's module resolution without ejecting. Downgraded to v6, which works with this toolchain out of the box and covers everything needed (routes, Link, useNavigate).
+- Updated the stale default CRA test (`App.test.js` was still checking for a "learn react" link) to check that the Login page renders instead.
+
 **2026-06-29 — Token efficiency & file strategy**
 - Agreed to keep CLAUDE.md lean (working guide, ~90 lines) and PRODUCT.md as the permanent record.
 - Pruning rule: when a sprint is complete, move its detailed spec here and remove from CLAUDE.md.

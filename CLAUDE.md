@@ -21,6 +21,7 @@
 | Layer | Technology |
 |-------|------------|
 | Frontend | React (JavaScript) |
+| Routing | react-router-dom v6 |
 | Styling | Plain CSS |
 | Hosting | Vercel (free tier, auto-deploys on git push) |
 | Version Control | GitHub |
@@ -41,6 +42,10 @@
 
 | If the task is about… | Read this file |
 |-----------------------|----------------|
+| Page routes (Login → Landing → Puzzle) | src/App.js |
+| Login page (stub, no real auth yet) | src/pages/LoginPage.js |
+| Landing page (hub — links to puzzle, more features later) | src/pages/LandingPage.js |
+| Puzzle page (thin wrapper around Crossword) | src/pages/PuzzlePage.js |
 | Top-level layout, difficulty selector, hint mode selector | src/components/Crossword.js |
 | All game state, effects, and logic (typing, checking, revealing) | src/hooks/useCrosswordGame.js |
 | Grid rendering, action buttons, legend | src/components/CrosswordGrid.js |
@@ -66,15 +71,15 @@ Sprint 2 and styling complete. Live on Vercel. Sri is testing.
 
 ---
 
-## Next Sprint — Sprint 4 (planned)
+## Next Sprint — Sprint 4 (in progress)
 
-- [ ] **App flow / navigation restructure** — Login page (stub for now, real auth later) → Landing page → Puzzle page
-  - Landing page becomes the hub: starts with just a link to the Crossword puzzle, more links/features added over time
-  - Needs routing added (e.g. react-router-dom) — app currently has no routing, single component tree
-  - Also ties into the **Practice by Topic** idea: a page where Sri picks Subject + Difficulty and gets a puzzle from just that slice (separate from the main puzzle page's difficulty-only selector)
-  - Planned start: late Sunday or Monday (~2026-07-05 / 07-06)
-- [ ] **Login page** — user authentication before accessing the puzzle (can stay a stub route until real auth is needed)
+- [x] **App flow / navigation restructure** — Login page (stub) → Landing page → Puzzle page. Done 2026-07-07.
+  - Added `react-router-dom` (v6 — v7 breaks CRA5's Jest module resolution, see Key Decisions) with 3 routes: `/` (Login stub), `/home` (Landing hub), `/puzzle` (Crossword, unchanged internally)
+  - Landing page links to the Crossword puzzle; more links/features get added here over time
+  - Login page has no real auth yet — a Continue button just navigates to `/home`
+  - Sets up the **Practice by Topic** idea: a future page where Sri picks Subject + Difficulty and gets a puzzle from just that slice (wordBank.json words already carry a `subject` tag for this)
 - [ ] **Admin section** — separate page to configure modes/settings (replacing hardcoded adminConfig.js)
+- [ ] Real login/auth (still deferred — current Login page is a stub)
 - [ ] Additional items TBD after Sri's testing
 
 ---
@@ -98,6 +103,7 @@ Sprint 2 and styling complete. Live on Vercel. Sri is testing.
 - **adminConfig.js** controls which hint modes are visible (useful for classroom vs casual settings)
 - **Multi-word terms:** stored without the space in the grid (e.g. MACHINELEARNING as one run of cells), with a visual break marker between words and "(2 words)" in the clue
 - **Word bank sources:** bfortuner/ml-glossary (MIT licence) + holasoymalva/llm-glossary (open source)
+- **react-router-dom pinned to v6, not v7:** v7's package.json `exports` map isn't resolvable by CRA5's Jest setup (`Cannot find module 'react-router/dom'`), and CRA doesn't allow easy Jest config overrides. v6 has everything this app needs (basic routes, `Link`, `useNavigate`) without the incompatibility.
 
 ---
 
