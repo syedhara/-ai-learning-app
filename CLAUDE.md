@@ -12,6 +12,7 @@
 **Owner:** Sri (Tech Manager, US-based) — developer background until 2015 (VB, C++, C#, SQL); Claude writes the code for this project
 **GitHub:** https://github.com/syedhara/-ai-learning-app
 **Vercel:** https://vercel.com/sri-y/ai-learning-app
+**Vercel Staging:** https://ai-learning-app-git-staging-sri-y.vercel.app/
 **Local path:** /Users/sriyedhara/project_hyd/ai-learning-app/
 
 ---
@@ -78,9 +79,16 @@ Sprint 2 and styling complete. Live on Vercel. Sri is testing.
   - Landing page links to the Crossword puzzle; more links/features get added here over time
   - Login page has no real auth yet — a Continue button just navigates to `/home`
   - Sets up the **Practice by Topic** idea: a future page where Sri picks Subject + Difficulty and gets a puzzle from just that slice (wordBank.json words already carry a `subject` tag for this)
+- [ ] **Login page** — build out real functionality (current page is just a stub Continue button). Next up.
+- [ ] **Practice by Topic** — separate puzzle page where Sri picks Subject + Difficulty and gets a puzzle from just that slice (wordBank.json words already carry a `subject` tag for this). Next up.
 - [ ] **Admin section** — separate page to configure modes/settings (replacing hardcoded adminConfig.js)
-- [ ] Real login/auth (still deferred — current Login page is a stub)
 - [ ] Additional items TBD after Sri's testing
+
+**Next session (2026-07-08) — start here:**
+1. Login page — real functionality
+2. Practice by Topic — subject-based puzzle page
+
+All work happens on the `staging` branch (PR #1: https://github.com/syedhara/-ai-learning-app/pull/1), not `main` — production stays untouched until we merge. Staging preview: https://ai-learning-app-git-staging-sri-y.vercel.app/
 
 ---
 

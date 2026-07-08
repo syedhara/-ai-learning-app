@@ -181,3 +181,4 @@ Items discussed but not scheduled. Review at sprint planning.
 | More puzzle types | Beyond crosswords — future formats TBD | Future |
 | Mobile app | After web app is validated | Future |
 | Admin UI panel | Currently admin config is code-only | Future |
+| Metrics | Usage/engagement tracking (e.g. puzzles completed, time spent, difficulty breakdown) — no analytics in place yet | Later, after Login + Practice by Topic |
