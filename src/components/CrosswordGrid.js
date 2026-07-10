@@ -38,34 +38,41 @@ export default function CrosswordGrid({
           pointerEvents: 'none',
         }}
       />
-      {/* ── Grid ── */}
-      <div
-        ref={gridRef}
-        className="grid"
-        tabIndex={0}
-        onKeyDown={onKeyDown}
-        style={{ gridTemplateColumns: `repeat(${GRID_COLS}, 36px)` }}
-      >
-        {Array.from({ length: GRID_ROWS }, (_, r) =>
-          Array.from({ length: GRID_COLS }, (_, c) => {
-            const status    = getCellStatus(r, c);
-            const cell      = solvedGrid[r][c];
-            const marker    = breakSet[`${r}-${c}`];
-            const prefilled = isPrefilled(r, c);
-            return (
-              <div
-                key={`${r}-${c}`}
-                className={`cell cell-${status}${prefilled ? ' cell-prefilled' : ''}`}
-                onClick={() => onCellClick(r, c)}
-              >
-                {cell?.number && <span className="cell-number">{cell.number}</span>}
-                {cell && <span className="cell-letter">{userGrid[r][c]}</span>}
-                {marker?.right  && <span className="word-break word-break-right" />}
-                {marker?.bottom && <span className="word-break word-break-bottom" />}
-              </div>
-            );
-          })
-        )}
+      {/* ── Grid ──
+        Only the column count comes from JS (--grid-cols). Actual cell size
+        (--cell-size) is set entirely by CSS media queries, so the grid
+        tracks and the .cell boxes always agree and shrink together on small
+        screens. The wrapper scrolls horizontally as a last-resort fallback
+        rather than silently clipping on very narrow phones. */}
+      <div className="grid-scroll">
+        <div
+          ref={gridRef}
+          className="grid"
+          tabIndex={0}
+          onKeyDown={onKeyDown}
+          style={{ '--grid-cols': GRID_COLS }}
+        >
+          {Array.from({ length: GRID_ROWS }, (_, r) =>
+            Array.from({ length: GRID_COLS }, (_, c) => {
+              const status    = getCellStatus(r, c);
+              const cell      = solvedGrid[r][c];
+              const marker    = breakSet[`${r}-${c}`];
+              const prefilled = isPrefilled(r, c);
+              return (
+                <div
+                  key={`${r}-${c}`}
+                  className={`cell cell-${status}${prefilled ? ' cell-prefilled' : ''}`}
+                  onClick={() => onCellClick(r, c)}
+                >
+                  {cell?.number && <span className="cell-number">{cell.number}</span>}
+                  {cell && <span className="cell-letter">{userGrid[r][c]}</span>}
+                  {marker?.right  && <span className="word-break word-break-right" />}
+                  {marker?.bottom && <span className="word-break word-break-bottom" />}
+                </div>
+              );
+            })
+          )}
+        </div>
       </div>
 
       {/* ── Action bar: mode buttons + clear in one row ── */}
