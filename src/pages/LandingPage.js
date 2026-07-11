@@ -8,7 +8,7 @@ export default function LandingPage() {
   return (
     <div className="page-container">
       <h1 className="puzzle-title">Learn AI</h1>
-      <p className="puzzle-tagline">Pick something to practice</p>
+      <p className="puzzle-tagline">Big plans, one (1) feature so far — go on, click the crossword before I change my mind.</p>
       <Link to="/puzzle" className="btn btn-primary">
         Crossword Puzzle
       </Link>

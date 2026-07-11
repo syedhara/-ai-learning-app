@@ -11,7 +11,7 @@ export default function LoginPage() {
   return (
     <div className="page-container">
       <h1 className="puzzle-title">Learn AI · Crossword</h1>
-      <p className="puzzle-tagline">Sign in to start learning</p>
+      <p className="puzzle-tagline">Login screen coming soon™ — for now, just smash the button below.</p>
       <button className="btn btn-primary" onClick={() => navigate('/home')}>
         Continue
       </button>
