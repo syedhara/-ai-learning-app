@@ -4,24 +4,12 @@ import wordBank from './wordBank.json';
 export const GRID_ROWS = 13;
 export const GRID_COLS = 14;
 
-// Helper: pull specific words from a difficulty level in wordBank.json
-const pick = (level, wordNames) =>
-  wordNames.map(w => wordBank[level].find(e => e.word === w)).filter(Boolean);
-
-// Word lists per difficulty — these are passed to generateCrossword() at runtime.
-// To add a word to a puzzle: add it to wordBank.json first, then include its key here.
+// Word lists per difficulty — the full wordBank.json entry list for that level.
+// generateCrossword() only places as many as fit well in one 13x14 grid (via
+// random anchor + shuffle attempts), so each generated puzzle surfaces a
+// different subset — the pool it draws from is just much bigger now.
 export const wordListsByDifficulty = {
-  beginner: pick('beginner', [
-    'CHATBOT', 'HALLUCINATION', 'TRAINING', 'TOKEN', 'PROMPT',
-    'MODEL', 'FINETUNE', 'DATASET', 'OUTPUT', 'NEURAL',
-    'DEEPLEARNING', 'CONTEXTWINDOW',
-  ]),
-  intermediate: pick('intermediate', [
-    'TRANSFORMER', 'REGRESSION', 'SUPERVISED', 'PARAMETER', 'PRECISION',
-    'FEATURE', 'RECALL', 'EPOCH', 'LOSS',
-  ]),
-  advanced: pick('advanced', [
-    'NORMALIZATION', 'CONVERGENCE', 'REGULARIZATION', 'QUANTIZATION',
-    'ATTENTION', 'PERPLEXITY', 'VARIANCE', 'PRETRAINING',
-  ]),
+  beginner: wordBank.beginner,
+  intermediate: wordBank.intermediate,
+  advanced: wordBank.advanced,
 };

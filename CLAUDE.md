@@ -98,7 +98,7 @@ All work happens on the `staging` branch (PR #1: https://github.com/syedhara/-ai
 - 3 hint modes: Check Answers / Live Feedback / Reveal on Demand (Reveal Letter + Reveal Word)
 - Admin config (`adminConfig.js`) to enable/disable modes per audience
 - Colour-coded legend below grid
-- wordBank.json — 79 terms: 29 beginner, 30 intermediate, 20 advanced (goal: grow to 300); each word tagged with `subject` for future topic filtering
+- wordBank.json — 179 terms: 62 beginner, 64 intermediate, 53 advanced (goal: grow to 300); each word tagged with `subject` for future topic filtering
 - Difficulty selection persists across browser refresh (localStorage)
 - Title: "Learn AI · Crossword"
 - "Need Help" button (opt-in, one-time per puzzle) reveals 12% of the grid as locked, Sudoku-style starting letters — helps first-timers get a foothold on unfamiliar terms. See PRODUCT.md.
