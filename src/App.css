@@ -435,7 +435,11 @@ body {
       "actions";
   }
 
-  .grid { --cell-size: 26px; }
+  /* Fluid columns instead of a fixed --cell-size — cells stretch to fill
+     the full width of the white card (no left-aligned leftover white
+     space), staying square via aspect-ratio. */
+  .grid { grid-template-columns: repeat(var(--grid-cols), 1fr); width: 100%; }
+  .cell { width: auto; height: auto; aspect-ratio: 1; }
   .cell-letter { font-size: 13px; }
   .cell-number { font-size: 7px; }
 
@@ -446,14 +450,12 @@ body {
 }
 
 /* ── Phone-width tightening ───────────────────────────────────────────────────
-   14 columns at 26px (plus gaps/border/padding) still overflows real phone
-   widths (~360-390px) once the page and card padding are subtracted, so
-   phones need a smaller cell size than tablets get at the 720px breakpoint. */
+   The grid itself is fluid (fills the card width) from the 720px breakpoint
+   up; this just tightens padding and letter size for narrower phones. */
 @media (max-width: 420px) {
   .App { padding: 16px 8px 32px; }
   .puzzle-card { padding: 10px; }
 
-  .grid { --cell-size: 21px; }
   .cell-letter { font-size: 11px; }
   .cell-number { font-size: 6px; }
 
