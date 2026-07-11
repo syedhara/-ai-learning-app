@@ -24,6 +24,24 @@ body {
   margin: 0 auto;
 }
 
+/* ── Simple centered pages (Login, Landing) ──────────────────────────────────── */
+.page-container {
+  max-width: 420px;
+  margin: 120px auto 0;
+  text-align: center;
+}
+
+/* Big pill button/link shared by Login's Continue and Landing's puzzle link */
+.btn-primary {
+  display: inline-block;
+  padding: 12px 28px;
+  font-size: 15px;
+  text-decoration: none;
+  background: #5aaa5a;
+  color: #fff;
+}
+.btn-primary:hover { background: #4a9a4a; }
+
 /* ── Title & tagline — centered ────────────────────────────────────────────── */
 .puzzle-title {
   font-size: 32px;
@@ -81,16 +99,37 @@ body {
   padding: 28px;
 }
 
-/* ── Puzzle layout: grid left, clues right ─────────────────────────────────── */
+/* ── Puzzle layout: grid area, clues area, actions area ──────────────────────
+   A grid (not flexbox) so grid/clues/actions can each be reassigned to a
+   different visual position per breakpoint via grid-template-areas, without
+   reordering them in the markup. Desktop: grid+actions stacked on the left,
+   clues on the right. Mobile: grid, then clues, then actions (see below). */
 .puzzle-layout {
-  display: flex;
-  gap: 36px;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    "grid    clues"
+    "actions clues";
+  gap: 12px 36px;
+  align-items: start;
 }
 
+.puzzle-grid-wrap { position: relative; grid-area: grid; }
+.clues-panel      { grid-area: clues; }
+.puzzle-actions   { grid-area: actions; }
+
 /* ── Grid ──────────────────────────────────────────────────────────────────── */
+/* Horizontal-scroll fallback — a safety net so an unexpectedly narrow
+   viewport scrolls the grid instead of clipping or blowing out the layout. */
+.grid-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
 .grid {
+  --cell-size: 36px;
   display: grid;
+  grid-template-columns: repeat(var(--grid-cols), var(--cell-size));
   gap: 1px;
   background: #555;
   border: 2px solid #555;
@@ -104,8 +143,8 @@ body {
 
 /* ── Individual cell ───────────────────────────────────────────────────────── */
 .cell {
-  width: 36px;
-  height: 36px;
+  width: var(--cell-size);
+  height: var(--cell-size);
   position: relative;
   display: flex;
   align-items: center;
@@ -382,12 +421,25 @@ body {
 @media (max-width: 720px) {
   .App { padding: 20px 12px 40px; }
 
+  .page-container { margin: 60px auto 0; }
+
   .puzzle-title  { font-size: 24px; }
   .puzzle-card   { padding: 16px; }
 
-  .puzzle-layout { flex-direction: column; }
+  /* Stack single-column, reordered: grid, then clues, then action buttons. */
+  .puzzle-layout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "grid"
+      "clues"
+      "actions";
+  }
 
-  .cell { width: 26px; height: 26px; }
+  /* Fluid columns instead of a fixed --cell-size — cells stretch to fill
+     the full width of the white card (no left-aligned leftover white
+     space), staying square via aspect-ratio. */
+  .grid { grid-template-columns: repeat(var(--grid-cols), 1fr); width: 100%; }
+  .cell { width: auto; height: auto; aspect-ratio: 1; }
   .cell-letter { font-size: 13px; }
   .cell-number { font-size: 7px; }
 
@@ -395,4 +447,22 @@ body {
 
   .action-bar { gap: 8px; }
   .btn { padding: 8px 14px; font-size: 12px; }
+}
+
+/* ── Phone-width tightening ───────────────────────────────────────────────────
+   The grid itself is fluid (fills the card width) from the 720px breakpoint
+   up; this just tightens padding and letter size for narrower phones. */
+@media (max-width: 420px) {
+  .App { padding: 16px 8px 32px; }
+  .puzzle-card { padding: 10px; }
+
+  .cell-letter { font-size: 11px; }
+  .cell-number { font-size: 6px; }
+
+  /* Shrink the Beginner/Intermediate/Advanced buttons so all three fit on
+     one row instead of the third wrapping onto its own line. */
+  .level-selector { gap: 8px; }
+  .mode-label     { font-size: 12px; }
+  .mode-buttons   { gap: 6px; }
+  .mode-btn       { padding: 6px 12px; font-size: 11px; border-width: 1px; }
 }

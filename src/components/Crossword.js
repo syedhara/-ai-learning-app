@@ -1,5 +1,6 @@
 import { useCrosswordGame } from '../hooks/useCrosswordGame';
 import CrosswordGrid from './CrosswordGrid';
+import CrosswordActions from './CrosswordActions';
 import CrosswordClues from './CrosswordClues';
 
 const DIFFICULTY_LABELS = {
@@ -66,6 +67,15 @@ export default function Crossword() {
                 onCellClick={game.handleCellClick}
                 onKeyDown={game.handleKeyDown}
                 onInputChange={game.handleInputChange}
+              />
+              <CrosswordClues
+                acrossWords={game.acrossWords}
+                downWords={game.downWords}
+                activeClueNum={game.activeClueNum}
+                direction={game.direction}
+                onClueClick={game.handleClueClick}
+              />
+              <CrosswordActions
                 mode={game.mode}
                 onSwitchMode={game.switchMode}
                 onCheckAnswers={game.checkAnswers}
@@ -74,13 +84,6 @@ export default function Crossword() {
                 onClear={game.clearPuzzle}
                 onNeedHelp={game.needHelp}
                 helpUsed={game.helpUsed}
-              />
-              <CrosswordClues
-                acrossWords={game.acrossWords}
-                downWords={game.downWords}
-                activeClueNum={game.activeClueNum}
-                direction={game.direction}
-                onClueClick={game.handleClueClick}
               />
             </div>
           </div>

@@ -1,12 +1,22 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
-import Crossword from './components/Crossword';
+import LoginPage from './pages/LoginPage';
+import LandingPage from './pages/LandingPage';
+import PuzzlePage from './pages/PuzzlePage';
 
-// App is the root of the application — it just renders the crossword puzzle
+// App is the root of the application — it sets up the page flow:
+// Login (stub for now) → Landing (hub) → Puzzle
 function App() {
   return (
-    <div className="App">
-      <Crossword />
-    </div>
+    <BrowserRouter>
+      <div className="App">
+        <Routes>
+          <Route path="/" element={<LoginPage />} />
+          <Route path="/home" element={<LandingPage />} />
+          <Route path="/puzzle" element={<PuzzlePage />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }
 
