@@ -99,12 +99,24 @@ body {
   padding: 28px;
 }
 
-/* ── Puzzle layout: grid left, clues right ─────────────────────────────────── */
+/* ── Puzzle layout: grid area, clues area, actions area ──────────────────────
+   A grid (not flexbox) so grid/clues/actions can each be reassigned to a
+   different visual position per breakpoint via grid-template-areas, without
+   reordering them in the markup. Desktop: grid+actions stacked on the left,
+   clues on the right. Mobile: grid, then clues, then actions (see below). */
 .puzzle-layout {
-  display: flex;
-  gap: 36px;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    "grid    clues"
+    "actions clues";
+  gap: 12px 36px;
+  align-items: start;
 }
+
+.puzzle-grid-wrap { position: relative; grid-area: grid; }
+.clues-panel      { grid-area: clues; }
+.puzzle-actions   { grid-area: actions; }
 
 /* ── Grid ──────────────────────────────────────────────────────────────────── */
 /* Horizontal-scroll fallback — a safety net so an unexpectedly narrow
@@ -414,7 +426,14 @@ body {
   .puzzle-title  { font-size: 24px; }
   .puzzle-card   { padding: 16px; }
 
-  .puzzle-layout { flex-direction: column; }
+  /* Stack single-column, reordered: grid, then clues, then action buttons. */
+  .puzzle-layout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "grid"
+      "clues"
+      "actions";
+  }
 
   .grid { --cell-size: 26px; }
   .cell-letter { font-size: 13px; }
@@ -437,4 +456,11 @@ body {
   .grid { --cell-size: 21px; }
   .cell-letter { font-size: 11px; }
   .cell-number { font-size: 6px; }
+
+  /* Shrink the Beginner/Intermediate/Advanced buttons so all three fit on
+     one row instead of the third wrapping onto its own line. */
+  .level-selector { gap: 8px; }
+  .mode-label     { font-size: 12px; }
+  .mode-buttons   { gap: 6px; }
+  .mode-btn       { padding: 6px 12px; font-size: 11px; border-width: 1px; }
 }

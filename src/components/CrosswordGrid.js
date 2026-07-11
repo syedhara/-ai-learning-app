@@ -1,15 +1,14 @@
 import { GRID_ROWS, GRID_COLS } from '../data/puzzleData';
-import { adminConfig } from '../data/adminConfig';
 
-// Renders the crossword grid and the action bar below it.
-// All game state and logic live in useCrosswordGame — this component is purely visual.
+// Renders the crossword grid itself. Action buttons live in CrosswordActions
+// so the grid, clues, and buttons can each sit in their own grid area and be
+// reordered independently between desktop and mobile (see App.css).
 export default function CrosswordGrid({
   solvedGrid, userGrid, getCellStatus, isPrefilled, breakSet, gridRef, inputRef,
-  onCellClick, onKeyDown, onInputChange, mode, onSwitchMode,
-  onCheckAnswers, onRevealLetter, onRevealWord, onClear, onNeedHelp, helpUsed,
+  onCellClick, onKeyDown, onInputChange,
 }) {
   return (
-    <div style={{ position: 'relative' }}>
+    <div className="puzzle-grid-wrap">
       {/*
         Hidden input — focused on cell tap so the mobile virtual keyboard pops up.
         font-size:16px prevents iOS from zooming the page on focus.
@@ -74,52 +73,6 @@ export default function CrosswordGrid({
           )}
         </div>
       </div>
-
-      {/* ── Action bar: mode buttons + clear in one row ── */}
-      <div className="action-bar">
-        {adminConfig.allowCheckAnswers && (
-          <button className="btn btn-check" onClick={onCheckAnswers}>
-            Check Answers
-          </button>
-        )}
-        {adminConfig.allowLiveFeedback && (
-          <button
-            className={`btn btn-live${mode === 'liveFeedback' ? ' btn-mode-active' : ''}`}
-            onClick={() => onSwitchMode(mode === 'liveFeedback' ? 'checkAnswers' : 'liveFeedback')}
-          >
-            Live Feedback
-          </button>
-        )}
-        {(adminConfig.allowRevealLetter || adminConfig.allowRevealWord) && (
-          <button
-            className={`btn btn-reveal-toggle${mode === 'reveal' ? ' btn-mode-active' : ''}`}
-            onClick={() => onSwitchMode(mode === 'reveal' ? 'checkAnswers' : 'reveal')}
-          >
-            Reveal on Demand
-          </button>
-        )}
-        <button className="btn btn-clear" onClick={onClear}>Clear</button>
-      </div>
-
-      {/* ── Need Help — own row so it doesn't crowd/shrink the buttons above ── */}
-      {adminConfig.prefillPercentage > 0 && !helpUsed && (
-        <div className="need-help-bar">
-          <button className="btn btn-need-help" onClick={onNeedHelp}>Need Help</button>
-          <span className="need-help-caption">Reveal some random letters</span>
-        </div>
-      )}
-
-      {/* ── Reveal sub-buttons — appear when Reveal on Demand is active ── */}
-      {mode === 'reveal' && (
-        <div className="reveal-sub-bar">
-          {adminConfig.allowRevealLetter && (
-            <button className="btn btn-reveal-sub" onClick={onRevealLetter}>Reveal Letter</button>
-          )}
-          {adminConfig.allowRevealWord && (
-            <button className="btn btn-reveal-sub" onClick={onRevealWord}>Reveal Word</button>
-          )}
-        </div>
-      )}
     </div>
   );
 }
