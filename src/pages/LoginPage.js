@@ -16,7 +16,9 @@ export default function LoginPage() {
 
   function handleContinue(e) {
     e.preventDefault();
-    setProfileName(name.trim());
+    const trimmed = name.trim();
+    if (!trimmed) return; // name is required — nothing to save yet
+    setProfileName(trimmed);
     navigate('/home');
   }
 
@@ -34,6 +36,7 @@ export default function LoginPage() {
               placeholder="Your name"
               value={name}
               onChange={e => setName(e.target.value)}
+              required
               autoFocus
             />
           </>
