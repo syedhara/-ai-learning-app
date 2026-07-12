@@ -109,10 +109,32 @@ Shown below the grid at all times. Explains the colour coding to the user.
 
 Stored in `src/data/wordBank.json`. Single source of truth for all words and clues.
 
-- 45 terms total: 18 beginner, 17 intermediate, 10 advanced
-- Each entry has: word, clue, category (general / ml / llm)
+- 179 terms total: 62 beginner, 64 intermediate, 53 advanced (grown from the original 45 on 2026-07-12)
+- Each entry has: word, clue, category (general / ml / llm), subject (LLM, Prompt Engineering, Machine Learning, NLP, AI Ethics & Safety, AI Agents)
 - Sources: bfortuner/ml-glossary (MIT licence) + holasoymalva/llm-glossary (open source)
-- Multi-word terms (e.g. MACHINE LEARNING) are reserved in `_multiword_reserved` — not yet in puzzles
+- Multi-word terms (e.g. MACHINE LEARNING) are stored without the space (see Multi-word terms decision below); 2-word compounds only — the grid's break marker only supports a single break point, so 3+ word phrases stay reserved in `_multiword_future` until the generator supports more than one break
+- `src/data/puzzleData.js` passes the **full** word list per difficulty into the generator (not a fixed hand-picked subset) — `generateCrossword()` places whatever fits well (~9-13 words per puzzle), so which words appear varies puzzle to puzzle
+
+---
+
+### Mobile Responsive Layout
+
+- **Grid sizing:** cell size is a single CSS custom property (`--cell-size`) read by both the grid's `grid-template-columns` and each `.cell`'s width/height, set per breakpoint by media queries. On mobile (≤720px) it switches to fluid `1fr` columns with `aspect-ratio: 1` cells instead of a fixed size, so the grid always fills the white puzzle card's width exactly, with no leftover white space and no overflow
+- **Layout order:** `.puzzle-layout` is a CSS grid using `grid-template-areas` with three named areas — grid, clues, actions (`CrosswordActions.js`, split out of `CrosswordGrid.js` so it's its own grid item). Desktop: grid+actions stacked on the left, clues on the right (unchanged from before). Mobile: grid, then clues, then actions — reordered purely via CSS, markup order unchanged
+- **Level selector:** Beginner/Intermediate/Advanced buttons shrink (smaller padding/font, tighter gaps) below 420px so all three fit on one row instead of the third wrapping to its own line
+- A `.grid-scroll` wrapper adds `overflow-x: auto` as a last-resort fallback so an unexpectedly narrow viewport scrolls instead of clipping
+
+---
+
+### Local Profile & Stats (Login page)
+
+No real accounts — see the Local-only decision below. `src/utils/progress.js` owns all of this via `localStorage`.
+
+- **Name required, no password** — Login won't let you Continue without typing a name. First-time visitors see a plain name field; returning visitors (name already saved) see a greeting + stats card instead, with a "Not you?" link to switch names (this does not wipe stats — stats belong to the device, not the name)
+- **Fresh words:** puzzles filter out words already shown at that difficulty (marked "seen" at puzzle-generation time, not completion time, so abandoning a puzzle still avoids repeats). Once a difficulty's puzzle generation places too few words from the unseen pool (fewer than 6), it recycles — clears that difficulty's seen-words and regenerates from the full list
+- **Stats tracked:** overall attempted/correct + a per-subject accuracy breakdown (best-accuracy-first, subjects with zero attempts omitted), recorded once per puzzle the moment it's fully solved
+- **"Correct" definition:** a word only counts as correct if none of its cells were ever touched by Reveal Letter, Reveal Word, or Need Help — otherwise it's attempted but not correct
+- **Local-only, single device:** everything lives in this browser's `localStorage`. Playing on a different phone or browser starts a completely separate profile with no shared history — there is no backend yet (see Backlog)
 
 ---
 
@@ -161,6 +183,32 @@ Chronological record of decisions made and why.
 - Tried react-router-dom v7 first — its package.json `exports` map isn't resolvable by CRA5's Jest resolver (`Cannot find module 'react-router/dom'`), and CRA doesn't expose a way to override Jest's module resolution without ejecting. Downgraded to v6, which works with this toolchain out of the box and covers everything needed (routes, Link, useNavigate).
 - Updated the stale default CRA test (`App.test.js` was still checking for a "learn react" link) to check that the Login page renders instead.
 
+**2026-07-12 — Mobile grid overflow root cause + fix**
+- Grid overflowed on phones despite an existing mobile media query. Root cause: `CrosswordGrid.js` set `grid-template-columns` via an inline JS style (`repeat(GRID_COLS, 36px)`) — inline styles can't be overridden by a CSS media query, so the grid stayed desktop-width regardless of screen size while individual `.cell` boxes shrank, leaving them mismatched.
+- Fixed by moving cell sizing entirely into CSS via a `--cell-size` custom property, set inline only for the column *count* (legitimately dynamic data) and never for size.
+- Later found the fixed-size mobile cells (26px) still didn't reliably fill the actual card width across different phone widths — switched mobile to fluid `1fr` columns + `aspect-ratio: 1` squares so the grid always exactly fills the card, no matter the device.
+
+**2026-07-12 — Mobile layout reorder (grid → clues → actions)**
+- Sri asked for clues directly below the grid and action buttons below the clues on mobile, plus the level-selector buttons fitting on one row.
+- Action buttons lived inside `CrosswordGrid.js` alongside the grid, so they couldn't be independently repositioned relative to the (separate) clues component via flexbox. Split them into `CrosswordActions.js` and switched `.puzzle-layout` from flexbox to CSS Grid with `grid-template-areas`, so each of grid/clues/actions can be placed per breakpoint without touching render order or duplicating markup.
+
+**2026-07-12 — Grew word bank to 179 terms, puzzles draw from the full pool**
+- Added 100 new AI/ML/LLM terms (bringing 79 → 179) so Sri could share the app with friends and have them see more variety than the original fixed 29-word puzzle picks.
+- Initially just added the words to `wordBank.json` without wiring them up — realized (and Sri confirmed) that `puzzleData.js` only pulled a fixed, named 29-word subset, so the extra words wouldn't actually appear in any puzzle. Changed `puzzleData.js` to pass the *full* per-difficulty list into `generateCrossword()` instead.
+- Verified via a standalone Node simulation (mocked nothing but timing) that this doesn't hurt performance or puzzle quality: ~300-450ms generation time, 9-13 words placed per puzzle, consistent across repeated runs.
+
+**2026-07-12 — Login page: local profile + stats, not real accounts**
+- Sri wanted the Login page to (1) serve fresh, non-repeating words and (2) show personal metrics, including per-subject accuracy (using the `subject` tags already on wordBank.json entries).
+- Considered real accounts (backend + database, works across devices) vs. a local-only profile (name only, no password, `localStorage`, one device). Chose local-only: this app has no backend at all yet, and local storage covers both stated goals without new infrastructure. Explicit tradeoff accepted: stats don't follow a user across devices (see Backlog — Cross-device backend).
+- Defined "correct" as solved-unaided (no Reveal Letter/Word/Need Help used on that word) per Sri's call, so revealed words still count as attempted but don't inflate accuracy.
+- Bug found during verification: an initial "recycle when the *remaining unseen pool* drops below N words" rule still produced a near-empty puzzle (1 word placed) when the leftover words just didn't intersect well — fixed by checking the actual `placed.length` after generation instead of the input pool size.
+- Initially patched a "blank name but has stats" edge case by decoupling the stats card from the name-editing state. Sri asked for the simpler fix instead: just require a name to Continue at all, removing the edge case entirely rather than working around it.
+
+**2026-07-12 — Cross-device backend: deferred, no decision yet**
+- Sri asked about using a JSON file as a lightweight backend for cross-device stats, wanting to stay on the free tier while still deciding what he actually wants.
+- Clarified that Vercel serverless functions have an ephemeral filesystem — a JSON file written from a function doesn't persist between invocations, so this isn't viable as-is.
+- Two free-tier-compatible options surfaced for whenever this gets prioritized: (a) a serverless function reading/writing a JSON file in a GitHub repo via the GitHub API (genuinely free, but fragile — multi-second commit latency, no concurrency protection); (b) a proper free-tier database (Supabase, Firebase) — purpose-built for this, still free at this app's scale. No decision made; not being built until Sri picks a direction.
+
 **2026-06-29 — Token efficiency & file strategy**
 - Agreed to keep CLAUDE.md lean (working guide, ~90 lines) and PRODUCT.md as the permanent record.
 - Pruning rule: when a sprint is complete, move its detailed spec here and remove from CLAUDE.md.
@@ -174,11 +222,11 @@ Items discussed but not scheduled. Review at sprint planning.
 
 | Item | Notes | Priority |
 |------|-------|----------|
-| Mobile fix | UI breaks on Samsung Galaxy S26 Ultra; keyboard doesn't pop up on cell tap | Later |
+| Cross-device backend | Local profile/stats (shipped 2026-07-12) only track one device/browser. Options explored: GitHub-API JSON-file hack (free, fragile) vs. proper free-tier DB (Supabase/Firebase). Undecided — Sri still thinking through what he wants, staying free-tier for now | Later |
 | Reveal limits | Cap letters/words revealed per word and per session | Later |
 | Topic selector | Let user pick a topic (LLMs, Prompts, Custom Chats) not just difficulty | Later |
-| User accounts | Login, progress tracking across sessions | Future sprint |
+| Real accounts | Login/password across devices — local-only profile shipped 2026-07-12 as an interim step; see Cross-device backend above | Future sprint |
 | More puzzle types | Beyond crosswords — future formats TBD | Future |
 | Mobile app | After web app is validated | Future |
 | Admin UI panel | Currently admin config is code-only | Future |
-| Metrics | Usage/engagement tracking (e.g. puzzles completed, time spent, difficulty breakdown) — no analytics in place yet | Later, after Login + Practice by Topic |
+| Metrics | Local per-device attempted/correct + per-subject accuracy shipped 2026-07-12 (see Local Profile & Stats). Server-side/aggregate analytics across all users still future | Later |
