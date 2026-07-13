@@ -52,6 +52,32 @@ export default function CrosswordActions({
           )}
         </div>
       )}
+
+      {/* What each button does — placed after the buttons here so it lands
+          below them on desktop and, since this whole component is the last
+          grid area on mobile, at the very bottom of the page there too. */}
+      <div className="button-help">
+        <p className="button-help-title">What these buttons do</p>
+        <ul className="button-help-list">
+          {adminConfig.allowCheckAnswers && (
+            <li><strong>Check Answers</strong> — colors your letters green or red when you click it</li>
+          )}
+          {adminConfig.allowLiveFeedback && (
+            <li><strong>Live Feedback</strong> — colors each letter the instant you type it</li>
+          )}
+          {(adminConfig.allowRevealLetter || adminConfig.allowRevealWord) && (
+            <li><strong>Reveal on Demand</strong> — turns on the Reveal Letter / Reveal Word buttons below</li>
+          )}
+          {adminConfig.prefillPercentage > 0 && (
+            <li><strong>Need Help</strong> — reveals a few random letters to start you off, once per puzzle</li>
+          )}
+          <li><strong>Clear</strong> — wipes your answers (keeps any revealed letters)</li>
+        </ul>
+        <p className="button-help-warning">
+          Heads up: using Reveal Letter, Reveal Word, or Need Help marks that word as
+          assisted — it won't count as correct in your stats.
+        </p>
+      </div>
     </div>
   );
 }

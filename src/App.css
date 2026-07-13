@@ -60,6 +60,91 @@ body {
   margin-bottom: 28px;
 }
 
+.landing-greeting {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a4a35;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+/* ── Login form (name input + returning-user stats) ──────────────────────── */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.login-note {
+  font-size: 12px;
+  color: #5bab88;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.login-name-input {
+  padding: 12px 16px;
+  font-size: 15px;
+  border: 2px solid #a0d8b8;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #1a4a35;
+}
+.login-name-input:focus {
+  outline: none;
+  border-color: #4aab80;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 13px;
+  color: #3a9068;
+  text-decoration: underline;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+.link-btn:hover { color: #2a7858; }
+
+/* ── Returning-user stats card ────────────────────────────────────────────── */
+.stats-card {
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 4px 24px rgba(60, 140, 100, 0.10);
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.stats-summary {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a4a35;
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.stats-subjects {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stats-subject-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 14px;
+  border-bottom: 1px solid #e0f2e8;
+}
+.stats-subject-row:last-child { border-bottom: none; }
+
+.stats-subject-name { color: #1a4a35; }
+.stats-subject-pct  { font-weight: 700; color: #3a9068; }
+
 /* ── Level selector — centered ─────────────────────────────────────────────── */
 .level-selector {
   display: flex;
@@ -197,6 +282,43 @@ body {
   margin-top: 8px;
   display: flex;
   gap: 8px;
+}
+
+/* ── Button help — explains what each action button does ─────────────────── */
+.button-help {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #e0f2e8;
+}
+
+.button-help-title {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #4aab80;
+  margin-bottom: 8px;
+}
+
+.button-help-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 13px;
+  color: #3a6a52;
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+.button-help-list strong { color: #1a4a35; }
+
+.button-help-warning {
+  font-size: 12px;
+  color: #8a5a10;
+  background: #fbf0d8;
+  border-radius: 8px;
+  padding: 8px 10px;
+  line-height: 1.4;
 }
 
 /* ── Shared button base ────────────────────────────────────────────────────── */

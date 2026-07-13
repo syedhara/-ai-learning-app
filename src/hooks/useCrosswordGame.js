@@ -2,6 +2,12 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { wordListsByDifficulty, GRID_ROWS, GRID_COLS } from '../data/puzzleData';
 import { generateCrossword } from '../utils/generateCrossword';
 import { adminConfig } from '../data/adminConfig';
+import * as progress from '../utils/progress';
+
+// A full-pool puzzle typically places 9-13 words (verified against the real
+// word bank). If a fresh (unseen-only) pool places fewer than this, it's too
+// sparse to be a good puzzle — recycle and regenerate from the full pool.
+const MIN_PLACED_WORDS = 6;
 
 // Builds the answer key grid from a list of placed words.
 // Called once after the generator finishes — not on every render.
@@ -89,6 +95,9 @@ export function useCrosswordGame() {
     Array.from({ length: GRID_ROWS }, () => Array(GRID_COLS).fill(''))
   );
   const [prefilledCells, setPrefilledCells] = useState(() => new Set());
+  // Cells revealed via Reveal Letter/Word — combined with prefilledCells
+  // (Need Help) to decide which words were solved "unaided" for stats.
+  const [revealedCells, setRevealedCells]   = useState(() => new Set());
   const [selected, setSelected]       = useState({ row: 0, col: 0 });
   const [direction, setDirection]     = useState('across');
   const [checked, setChecked]         = useState(false);
@@ -103,6 +112,9 @@ export function useCrosswordGame() {
   // Desktop/iOS: onKeyDown fires first and sets this true; onChange skips.
   // Android: onKeyDown doesn't fire for IME letters, so onChange handles them.
   const letterHandledRef = useRef(false);
+  // Guards against recording the same puzzle's stats more than once
+  // (e.g. if solved re-renders after the puzzle is already complete).
+  const hasRecordedRef = useRef(false);
 
   const acrossWords = useMemo(() => activeWords.filter(w => w.direction === 'across'), [activeWords]);
   const downWords   = useMemo(() => activeWords.filter(w => w.direction === 'down'),   [activeWords]);
@@ -134,12 +146,27 @@ export function useCrosswordGame() {
     setSolved(false);
     setHelpUsed(false);
     setPrefilledCells(new Set());
+    setRevealedCells(new Set());
+    hasRecordedRef.current = false;
 
     // setTimeout(0) lets React paint the loading spinner before the generator
     // runs its synchronous search.
     const t = setTimeout(() => {
-      const wordList = wordListsByDifficulty[difficulty];
-      const { placed } = generateCrossword(wordList, 500);
+      const fullList = wordListsByDifficulty[difficulty];
+      const seen = new Set(progress.getSeenWords(difficulty));
+      const freshPool = fullList.filter(e => !seen.has(e.word));
+
+      let placed = generateCrossword(freshPool, 500).placed;
+      // How many words a pool places depends on whether those specific words'
+      // letters happen to intersect well, not just how many are left — a
+      // small or awkward remaining pool can produce a sparse puzzle. If this
+      // one came out too thin, recycle (clear seen-words for this level) and
+      // regenerate from the full pool instead, which is known to place well.
+      if (placed.length < MIN_PLACED_WORDS) {
+        progress.resetSeenWords(difficulty);
+        placed = generateCrossword(fullList, 500).placed;
+      }
+      progress.addSeenWords(difficulty, placed.map(w => w.word));
       setActiveWords(placed);
       const solved = buildSolvedGrid(placed);
       setSolvedGrid(solved);
@@ -160,6 +187,24 @@ export function useCrosswordGame() {
   useEffect(() => {
     if (!generating) inputRef.current?.focus();
   }, [generating]);
+
+  // Record per-word stats once, the moment a puzzle is fully solved. A word
+  // only counts as "correct" if none of its cells were ever revealed via
+  // Reveal Letter/Word or Need Help — otherwise it's attempted-but-not-correct.
+  useEffect(() => {
+    if (!solved || hasRecordedRef.current) return;
+    hasRecordedRef.current = true;
+    const assisted = new Set([...prefilledCells, ...revealedCells]);
+    activeWords.forEach(({ word, direction: dir, row, col, subject }) => {
+      let wasAssisted = false;
+      for (let i = 0; i < word.length; i++) {
+        const r = dir === 'down'   ? row + i : row;
+        const c = dir === 'across' ? col + i : col;
+        if (assisted.has(`${r}-${c}`)) { wasAssisted = true; break; }
+      }
+      progress.recordAttempt({ subject, correct: !wasAssisted });
+    });
+  }, [solved, activeWords, prefilledCells, revealedCells]);
 
   // ── Game logic ─────────────────────────────────────────────────────────────
   function isPuzzleSolved(grid) {
@@ -302,6 +347,7 @@ export function useCrosswordGame() {
     const newGrid = userGrid.map(r => [...r]);
     newGrid[row][col] = solvedGrid[row][col].letter;
     setUserGrid(newGrid);
+    setRevealedCells(prev => new Set(prev).add(`${row}-${col}`));
     if (isPuzzleSolved(newGrid)) setSolved(true);
   }
 
@@ -312,12 +358,15 @@ export function useCrosswordGame() {
     const wordDef = activeWords.find(w => w.number === wordNum);
     if (!wordDef) return;
     const newGrid = userGrid.map(r => [...r]);
+    const touched = [];
     for (let i = 0; i < wordDef.word.length; i++) {
       const r = wordDef.direction === 'down'   ? wordDef.row + i : wordDef.row;
       const c = wordDef.direction === 'across' ? wordDef.col + i : wordDef.col;
       newGrid[r][c] = wordDef.word[i];
+      touched.push(`${r}-${c}`);
     }
     setUserGrid(newGrid);
+    setRevealedCells(prev => new Set([...prev, ...touched]));
     if (isPuzzleSolved(newGrid)) setSolved(true);
   }
 
