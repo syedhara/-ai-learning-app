@@ -60,11 +60,26 @@ body {
   margin-bottom: 28px;
 }
 
+.landing-greeting {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a4a35;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
 /* ── Login form (name input + returning-user stats) ──────────────────────── */
 .login-form {
   display: flex;
   flex-direction: column;
   align-items: stretch;
+}
+
+.login-note {
+  font-size: 12px;
+  color: #5bab88;
+  margin-bottom: 16px;
+  line-height: 1.4;
 }
 
 .login-name-input {
@@ -267,6 +282,43 @@ body {
   margin-top: 8px;
   display: flex;
   gap: 8px;
+}
+
+/* ── Button help — explains what each action button does ─────────────────── */
+.button-help {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #e0f2e8;
+}
+
+.button-help-title {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #4aab80;
+  margin-bottom: 8px;
+}
+
+.button-help-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 13px;
+  color: #3a6a52;
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+.button-help-list strong { color: #1a4a35; }
+
+.button-help-warning {
+  font-size: 12px;
+  color: #8a5a10;
+  background: #fbf0d8;
+  border-radius: 8px;
+  padding: 8px 10px;
+  line-height: 1.4;
 }
 
 /* ── Shared button base ────────────────────────────────────────────────────── */

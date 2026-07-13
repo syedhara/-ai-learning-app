@@ -30,6 +30,10 @@ export default function LoginPage() {
         {editingName ? (
           <>
             <p className="puzzle-tagline">No passwords here — just tell us who's playing.</p>
+            <p className="login-note">
+              No backend — your name just labels the stats we keep on this device.
+              Play on another device or browser and you'll start fresh.
+            </p>
             <input
               className="login-name-input"
               type="text"
