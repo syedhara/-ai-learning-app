@@ -48,7 +48,8 @@
 | Landing page (hub — links to puzzle, more features later) | src/pages/LandingPage.js |
 | Puzzle page (thin wrapper around Crossword) | src/pages/PuzzlePage.js |
 | Top-level layout, difficulty selector, hint mode selector | src/components/Crossword.js |
-| All game state, effects, and logic (typing, checking, revealing, fresh-word rotation, stats recording) | src/hooks/useCrosswordGame.js |
+| All game state, effects, and logic (typing, checking, revealing, fresh-word rotation, stats recording, word-review gate) | src/hooks/useCrosswordGame.js |
+| Word review (flashcards) screen shown before the grid | src/components/WordReview.js |
 | Grid rendering only | src/components/CrosswordGrid.js |
 | Action buttons (mode buttons, Need Help, Reveal sub-buttons) — own grid area so mobile can reorder it below the clues | src/components/CrosswordActions.js |
 | Across/Down clue panels | src/components/CrosswordClues.js |
@@ -90,6 +91,10 @@ Sprint 2 and styling complete. Live on Vercel. Sri is testing.
   - Local profile only — a required name, no password, no backend (see Key Decisions and `src/utils/progress.js`)
   - Returning users see a stats card instead of the name field: overall attempted/correct + per-subject accuracy (using the `subject` tags already on every word)
   - Puzzles now avoid repeating words already shown per difficulty ("fresh words"), recycling once a level's pool would otherwise produce a sparse puzzle
+- [x] **Word review (flashcards) before the grid** — done 2026-07-18.
+  - Testers with no prior AI vocabulary couldn't complete even one puzzle — the hint modes all assume you already know the word and need to recall it, but new vocabulary has nothing to recall
+  - New puzzle now opens on a flashcard-style review screen (`src/components/WordReview.js`) listing the exact words that got placed in *this* puzzle (clue + subject tag; tap the card to reveal/hide the word), with Prev/Next navigation and a "Skip review" link for repeat players
+  - `useCrosswordGame.js` gates the grid behind a new `reviewing` state — true on every fresh puzzle (difficulty switch or reload), cleared by a "Start Puzzle" button
 - [ ] **Practice by Topic** — separate puzzle page where Sri picks Subject + Difficulty and gets a puzzle from just that slice (wordBank.json words already carry a `subject` tag for this). Next up.
 - [ ] **Admin section** — separate page to configure modes/settings (replacing hardcoded adminConfig.js)
 - [ ] Additional items TBD after Sri's testing

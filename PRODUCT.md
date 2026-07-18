@@ -62,6 +62,17 @@ Two sub-options:
 
 ---
 
+### Word Review (Flashcards) — Shown Before the Grid
+
+- After a puzzle finishes generating, the user lands on a review screen (`src/components/WordReview.js`) instead of the grid — the grid is gated behind a `reviewing` state in `useCrosswordGame.js`
+- Shows one flashcard at a time for every word actually placed in *this* puzzle: a subject tag, the clue, and the answer hidden as underscores (respecting multi-word breaks, e.g. "____ _____")
+- Tapping/clicking the card (or pressing Enter/Space) toggles the word between hidden and revealed — users can flip back and forth to test themselves
+- Prev/Next buttons plus an "X / N" counter step through all the words; a "Skip review →" link and a "Start Puzzle" button both drop straight into the grid at any point
+- Switching difficulty or reloading regenerates the puzzle and always reopens on the review screen — it is not a one-time-per-session thing, since the word subset changes every puzzle
+- Goal: give users something to actually recall before the crossword's hint modes (which all assume prior recall) kick in — testers with zero AI vocabulary couldn't finish even one grid without this
+
+---
+
 ### Need Help — On-Demand Starting Letters (Sudoku-style hints)
 
 - Grid loads with **no letters revealed**. A "Need Help" button in the action bar (caption: "Reveal some random letters") lets the user opt in
@@ -203,6 +214,13 @@ Chronological record of decisions made and why.
 - Defined "correct" as solved-unaided (no Reveal Letter/Word/Need Help used on that word) per Sri's call, so revealed words still count as attempted but don't inflate accuracy.
 - Bug found during verification: an initial "recycle when the *remaining unseen pool* drops below N words" rule still produced a near-empty puzzle (1 word placed) when the leftover words just didn't intersect well — fixed by checking the actual `placed.length` after generation instead of the input pool size.
 - Initially patched a "blank name but has stats" edge case by decoupling the stats card from the name-editing state. Sri asked for the simpler fix instead: just require a name to Continue at all, removing the edge case entirely rather than working around it.
+
+**2026-07-18 — Word review (flashcards) added before the grid**
+- Sri reported that everyone he shared the crossword with struggled to complete even one grid — the 3 hint modes and "Need Help" pre-fill all assume the user already knows the word and just needs a nudge to recall it, but first-time AI vocabulary has nothing to recall yet.
+- Considered a flashcard review screen vs. other options (e.g. a matching game, a multiple-choice quiz) — chose flashcards: lowest-effort to build, directly shows the clue-to-word mapping the crossword will later test, and lets the user self-test by flipping cards rather than passively reading a list.
+- Deliberately shows the words *actually placed in that puzzle instance* (not the whole word bank) so the review matches what the user is about to be tested on.
+- Made it skippable (a "Skip review" link alongside the mandatory-feeling "Start Puzzle" button) rather than a forced gate, so repeat players who already know the words aren't slowed down every time.
+- Not persisted as a one-time "seen it" flag — intentionally reappears on every new puzzle since the word subset changes each time a puzzle regenerates.
 
 **2026-07-12 — Cross-device backend: deferred, no decision yet**
 - Sri asked about using a JSON file as a lightweight backend for cross-device stats, wanting to stay on the free tier while still deciding what he actually wants.

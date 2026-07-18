@@ -105,6 +105,11 @@ export function useCrosswordGame() {
   const [mode, setMode]               = useState(getDefaultMode);
   // "Need Help" reveals a batch of random letters once per puzzle — starts unused each time a new puzzle loads.
   const [helpUsed, setHelpUsed]       = useState(false);
+  // Testers with no prior AI vocabulary had nothing to recall once dropped
+  // straight into the grid. Every new puzzle now opens on a word-review
+  // (flashcard) screen first — `reviewing` gates the grid until the user
+  // clicks "Start Puzzle".
+  const [reviewing, setReviewing]     = useState(true);
 
   const gridRef    = useRef(null);
   const inputRef   = useRef(null);
@@ -147,6 +152,7 @@ export function useCrosswordGame() {
     setHelpUsed(false);
     setPrefilledCells(new Set());
     setRevealedCells(new Set());
+    setReviewing(true);
     hasRecordedRef.current = false;
 
     // setTimeout(0) lets React paint the loading spinner before the generator
@@ -182,11 +188,13 @@ export function useCrosswordGame() {
     return () => clearTimeout(t);
   }, [difficulty]);
 
-  // Focus the hidden input after generation so keyboard navigation works immediately.
-  // The hidden input triggers the mobile virtual keyboard; desktop ignores the opacity:0 element.
+  // Focus the hidden input once the grid is actually visible (generation done
+  // and the user has clicked past the word-review screen) so keyboard
+  // navigation works immediately. The hidden input triggers the mobile
+  // virtual keyboard; desktop ignores the opacity:0 element.
   useEffect(() => {
-    if (!generating) inputRef.current?.focus();
-  }, [generating]);
+    if (!generating && !reviewing) inputRef.current?.focus();
+  }, [generating, reviewing]);
 
   // Record per-word stats once, the moment a puzzle is fully solved. A word
   // only counts as "correct" if none of its cells were ever revealed via
@@ -223,6 +231,11 @@ export function useCrosswordGame() {
       setDifficulty(newDifficulty);
       localStorage.setItem(DIFFICULTY_STORAGE_KEY, newDifficulty);
     }
+  }
+
+  // Leaves the word-review screen and reveals the grid.
+  function startPuzzle() {
+    setReviewing(false);
   }
 
   function isPrefilled(row, col) {
@@ -437,6 +450,8 @@ export function useCrosswordGame() {
     difficulty, generating, activeWords,
     solved, mode, availableModes,
     switchDifficulty, switchMode,
+    // Word-review (flashcards) screen, shown before the grid
+    reviewing, startPuzzle,
     // Grid component props
     solvedGrid, userGrid, getCellStatus, isPrefilled, breakSet, gridRef, inputRef,
     handleCellClick, handleKeyDown, handleInputChange,

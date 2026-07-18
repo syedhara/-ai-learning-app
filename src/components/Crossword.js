@@ -2,6 +2,7 @@ import { useCrosswordGame } from '../hooks/useCrosswordGame';
 import CrosswordGrid from './CrosswordGrid';
 import CrosswordActions from './CrosswordActions';
 import CrosswordClues from './CrosswordClues';
+import WordReview from './WordReview';
 
 const DIFFICULTY_LABELS = {
   beginner:     'Beginner',
@@ -38,7 +39,9 @@ export default function Crossword() {
       <p className="puzzle-subtitle">
         {game.generating
           ? `${DIFFICULTY_LABELS[game.difficulty]} · Building puzzle…`
-          : `${DIFFICULTY_LABELS[game.difficulty]} · ${game.activeWords.length} Words · Click a cell, then type`}
+          : game.reviewing
+            ? `${DIFFICULTY_LABELS[game.difficulty]} · Review the words before you start`
+            : `${DIFFICULTY_LABELS[game.difficulty]} · ${game.activeWords.length} Words · Click a cell, then type`}
       </p>
 
       {/* ── Loading spinner while the generator runs ── */}
@@ -47,6 +50,12 @@ export default function Crossword() {
           <span className="generating-spinner" />
           <span>Building {DIFFICULTY_LABELS[game.difficulty].toLowerCase()} puzzle…</span>
         </div>
+      ) : game.reviewing ? (
+        <WordReview
+          words={game.activeWords}
+          difficultyLabel={DIFFICULTY_LABELS[game.difficulty]}
+          onStart={game.startPuzzle}
+        />
       ) : (
         <>
           {game.solved && (
