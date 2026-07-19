@@ -14,9 +14,14 @@ export default function LandingPage() {
       <h1 className="puzzle-title">Learn AI, One Puzzle at a Time</h1>
       {name && <p className="landing-greeting">{isReturning ? 'Welcome back' : 'Welcome'}, {name}!</p>}
       <p className="puzzle-tagline">Big plans, one (1) feature so far — go on, click the crossword before I change my mind.</p>
-      <Link to="/puzzle" className="btn btn-primary">
-        Crossword Puzzle
-      </Link>
+      <div className="landing-links">
+        <Link to="/puzzle" className="btn btn-primary">
+          Crossword Puzzle
+        </Link>
+        <Link to="/review" className="btn btn-outline">
+          Review Vocabulary
+        </Link>
+      </div>
     </div>
   );
 }

@@ -13,3 +13,14 @@ export const wordListsByDifficulty = {
   intermediate: wordBank.intermediate,
   advanced: wordBank.advanced,
 };
+
+// Every word across all three difficulties, each tagged with its difficulty —
+// used by the Review Vocabulary / Flashcards pages, which browse the whole
+// word bank rather than just one generated puzzle's worth.
+export const allWords = Object.entries(wordListsByDifficulty).flatMap(
+  ([difficulty, list]) => list.map(entry => ({ ...entry, difficulty }))
+);
+
+// Every distinct subject tag, alphabetical — populates the subject filter.
+export const subjects = [...new Set(allWords.map(w => w.subject))].sort();
+

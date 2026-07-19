@@ -86,6 +86,19 @@ Two sub-options:
 
 ---
 
+### Review Vocabulary & Flashcards Pages (Study Hub, Separate from the Puzzle)
+
+- Landing page links to a **Review Vocabulary** hub (`src/pages/ReviewVocabularyPage.js`, route `/review`), alongside the Crossword Puzzle link
+- **Glossary section** (on the Review Vocabulary page itself): every word in `wordBank.json` — word, its `clue` shown as the definition, a subject tag, and a difficulty tag (Beginner/Intermediate/Advanced, colour-coded) — filterable by difficulty and/or subject via the shared `WordFilterBar`
+- **Flashcards section**: a card on the same page links out to a dedicated **Flashcards** page (`src/pages/FlashcardsPage.js`, route `/review/flashcards`)
+- The Flashcards page browses the *entire* word bank (not just one puzzle's words like the pre-puzzle word review) as a one-at-a-time deck, filterable the same way as the glossary; Prev/Next + an "X / N" counter step through the filtered deck, and changing a filter resets back to card 1
+- Both learning pages link back to the Crossword Puzzle ("Crossword Puzzle →") so users can jump straight into play once they feel ready
+- `src/components/Flashcard.js` is the single flippable-card presentation (subject tag, clue, hidden/revealed word) shared by both the Flashcards page and the pre-puzzle `WordReview` screen, so the two experiences look and behave identically
+- `src/data/puzzleData.js` exports `allWords` (every word across all three difficulties, each tagged with its `difficulty`) and `subjects` (the distinct subject list) to power both pages
+- No separate "example sentence" field — the existing `clue` text doubles as the definition, to avoid a large data-entry effort across 179 terms; worked examples are a possible future addition (see Backlog)
+
+---
+
 ### Admin Controls
 
 Stored in `src/data/adminConfig.js`. Controls which modes are available app-wide.
@@ -222,6 +235,13 @@ Chronological record of decisions made and why.
 - Made it skippable (a "Skip review" link alongside the mandatory-feeling "Start Puzzle" button) rather than a forced gate, so repeat players who already know the words aren't slowed down every time.
 - Not persisted as a one-time "seen it" flag — intentionally reappears on every new puzzle since the word subset changes each time a puzzle regenerates.
 
+**2026-07-18 — Added dedicated Review Vocabulary + Flashcards pages**
+- Sri wasn't sure the in-puzzle flashcard review alone was enough — wanted a proper standalone place to study, browsing by difficulty/subject rather than just the words in one generated puzzle. Proposed a "Review Vocabulary" hub with a filterable glossary plus a link out to a separate Flashcards page; Sri agreed.
+- Reused the existing flashcard visual instead of designing a new one: extracted it into a shared `Flashcard.js` component so the pre-puzzle review and the new standalone Flashcards page look and behave identically, rather than maintaining two versions.
+- Glossary shows word + `clue` (as definition) + subject + difficulty, filterable by both via a shared `WordFilterBar` component (also used by the Flashcards page) — considered a real HTML `<table>` first, went with a stacked card-per-word layout instead since it's mobile-friendly by default without needing a separate breakpoint rewrite.
+- Skipped adding a separate "example sentence" field — would mean writing ~179 new fields by hand for comparatively little learning benefit over the existing clue text. Flagged as a possible future addition instead of blocking this feature on it.
+- Landing page now offers two links (Crossword Puzzle, Review Vocabulary) instead of one; both learning pages link back to the Crossword Puzzle so the loop between studying and testing is easy to complete in either direction.
+
 **2026-07-12 — Cross-device backend: deferred, no decision yet**
 - Sri asked about using a JSON file as a lightweight backend for cross-device stats, wanting to stay on the free tier while still deciding what he actually wants.
 - Clarified that Vercel serverless functions have an ephemeral filesystem — a JSON file written from a function doesn't persist between invocations, so this isn't viable as-is.
@@ -248,3 +268,4 @@ Items discussed but not scheduled. Review at sprint planning.
 | Mobile app | After web app is validated | Future |
 | Admin UI panel | Currently admin config is code-only | Future |
 | Metrics | Local per-device attempted/correct + per-subject accuracy shipped 2026-07-12 (see Local Profile & Stats). Server-side/aggregate analytics across all users still future | Later |
+| Worked examples per term | Glossary/Flashcards (shipped 2026-07-18) reuse the existing `clue` text as the definition — a separate "example sentence" field per word would need ~179 entries written by hand | Later |

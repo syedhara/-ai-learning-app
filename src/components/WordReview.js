@@ -1,20 +1,5 @@
 import { useState } from 'react';
-
-// Multi-word terms are stored without a space (e.g. "DEEPLEARNING") plus a
-// breakAfter letter-count. These helpers turn that back into readable text —
-// formatWord() for the revealed answer, formatBlanks() for the hidden one.
-function formatWord(word, breakAfter) {
-  if (!breakAfter) return word;
-  return `${word.slice(0, breakAfter)} ${word.slice(breakAfter)}`;
-}
-
-function formatBlanks(word, breakAfter) {
-  const dashes = word.split('').map(() => '_').join(' ');
-  if (!breakAfter) return dashes;
-  // breakAfter counts letters, and each letter became "_ " (2 chars) in dashes.
-  const splitAt = breakAfter * 2 - 1;
-  return `${dashes.slice(0, splitAt)}   ${dashes.slice(splitAt)}`;
-}
+import Flashcard from './Flashcard';
 
 // ── Word review (flashcards) ────────────────────────────────────────────────
 // Shown right after a puzzle is generated but before the grid appears.
@@ -55,20 +40,7 @@ export default function WordReview({ words, difficultyLabel, onStart }) {
         </button>
       </div>
 
-      <div
-        className="flashcard"
-        role="button"
-        tabIndex={0}
-        onClick={toggleReveal}
-        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleReveal(); } }}
-      >
-        <span className="flashcard-subject">{current.subject}</span>
-        <p className="flashcard-clue">{current.clue}</p>
-        <div className={`flashcard-answer${isRevealed ? ' flashcard-answer-revealed' : ''}`}>
-          {isRevealed ? formatWord(current.word, current.breakAfter) : formatBlanks(current.word, current.breakAfter)}
-        </div>
-        <span className="flashcard-tap-hint">{isRevealed ? 'Tap to hide' : 'Tap to reveal'}</span>
-      </div>
+      <Flashcard word={current} revealed={isRevealed} onToggle={toggleReveal} />
 
       <div className="flashcard-nav">
         <button className="btn btn-clear" onClick={() => goTo(index - 1)}>&lsaquo; Prev</button>
@@ -82,3 +54,4 @@ export default function WordReview({ words, difficultyLabel, onStart }) {
     </div>
   );
 }
+

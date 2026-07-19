@@ -47,6 +47,11 @@
 | Login page (name required; shows stats for returning users) | src/pages/LoginPage.js |
 | Landing page (hub — links to puzzle, more features later) | src/pages/LandingPage.js |
 | Puzzle page (thin wrapper around Crossword) | src/pages/PuzzlePage.js |
+| Review Vocabulary page (glossary grid + link to flashcards) | src/pages/ReviewVocabularyPage.js |
+| Flashcards page (standalone deck, filterable by difficulty/subject) | src/pages/FlashcardsPage.js |
+| Difficulty + subject filter dropdowns (shared by both learning pages) | src/components/WordFilterBar.js |
+| Single flippable flashcard (shared by word review and Flashcards page) | src/components/Flashcard.js |
+| Word-formatting helpers (multi-word display, blanks) | src/utils/wordFormat.js |
 | Top-level layout, difficulty selector, hint mode selector | src/components/Crossword.js |
 | All game state, effects, and logic (typing, checking, revealing, fresh-word rotation, stats recording, word-review gate) | src/hooks/useCrosswordGame.js |
 | Word review (flashcards) screen shown before the grid | src/components/WordReview.js |
@@ -56,6 +61,7 @@
 | Runtime crossword generator algorithm | src/utils/generateCrossword.js |
 | Local profile + stats (localStorage: name, seen words, attempted/correct, per-subject accuracy) | src/utils/progress.js |
 | Which words are eligible per difficulty (now the full wordBank.json list per level, not a fixed pick) | src/data/puzzleData.js |
+| Every word flattened across difficulties + subject list (used by Review Vocabulary / Flashcards) | src/data/puzzleData.js (`allWords`, `subjects`) |
 | Words, clues, difficulty levels, multi-word terms | src/data/wordBank.json |
 | Feature flags (enable/disable hint modes) | src/data/adminConfig.js |
 | All styling | src/App.css |
@@ -96,6 +102,12 @@ Sprint 2 and styling complete. Live on Vercel. Sri is testing.
   - New puzzle now opens on a flashcard-style review screen (`src/components/WordReview.js`) listing the exact words that got placed in *this* puzzle (clue + subject tag; tap the card to reveal/hide the word), with Prev/Next navigation and a "Skip review" link for repeat players
   - `useCrosswordGame.js` gates the grid behind a new `reviewing` state — true on every fresh puzzle (difficulty switch or reload), cleared by a "Start Puzzle" button
 - [ ] **Practice by Topic** — separate puzzle page where Sri picks Subject + Difficulty and gets a puzzle from just that slice (wordBank.json words already carry a `subject` tag for this). Next up.
+- [x] **Review Vocabulary + standalone Flashcards pages** — done 2026-07-18.
+  - Landing page now links to two things: Crossword Puzzle and a new **Review Vocabulary** hub (`src/pages/ReviewVocabularyPage.js`, route `/review`)
+  - Review Vocabulary has two sections: a filterable **Glossary** (word, definition, subject tag, difficulty tag — filter by difficulty and/or subject via the shared `WordFilterBar`) and a card linking out to a dedicated **Flashcards** page
+  - Flashcards page (`src/pages/FlashcardsPage.js`, route `/review/flashcards`) browses the *entire* word bank as a filterable deck (not just one puzzle's words like the pre-puzzle word review) — same flip-to-reveal card, reused via a new shared `Flashcard.js` component
+  - Both learning pages link back to the Crossword Puzzle so users can jump straight into play once they feel ready
+  - No "example sentence" field yet — reused the existing `clue` text as the definition to avoid a large data-entry effort; worked examples are a possible future addition (see Backlog)
 - [ ] **Admin section** — separate page to configure modes/settings (replacing hardcoded adminConfig.js)
 - [ ] Additional items TBD after Sri's testing
 

@@ -42,6 +42,27 @@ body {
 }
 .btn-primary:hover { background: #4a9a4a; }
 
+/* Landing page's stack of hub links — Crossword Puzzle (primary) + Review
+   Vocabulary (secondary, outlined so it doesn't visually compete). */
+.landing-links {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.btn-outline {
+  display: inline-block;
+  padding: 12px 28px;
+  font-size: 15px;
+  text-decoration: none;
+  background: #fff;
+  color: #3a9068;
+  border: 2px solid #a0d8b8;
+}
+.btn-outline:hover { border-color: #4aab80; background: #f0faf5; }
+
+
 /* ── Title & tagline — centered ────────────────────────────────────────────── */
 .puzzle-title {
   font-size: 32px;
@@ -614,6 +635,145 @@ body {
   font-size: 16px;
 }
 
+/* ── Review Vocabulary & Flashcards pages ──────────────────────────────────── */
+.review-container {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.review-nav-links {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.review-nav-links .link-btn { margin-bottom: 0; }
+
+.review-section {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(60, 140, 100, 0.10);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.review-section-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1a4a35;
+  margin-bottom: 14px;
+}
+
+.review-flashcard-cta {
+  text-align: center;
+}
+.review-flashcard-cta .review-intro { text-align: center; margin-bottom: 16px; }
+
+/* ── Difficulty / subject filter bar ───────────────────────────────────────── */
+.filter-bar {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 140px;
+}
+
+.filter-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #3a9068;
+}
+
+.filter-field select {
+  padding: 9px 12px;
+  font-size: 14px;
+  border: 2px solid #a0d8b8;
+  border-radius: 8px;
+  background: #fff;
+  color: #1a4a35;
+}
+.filter-field select:focus {
+  outline: none;
+  border-color: #4aab80;
+}
+
+/* ── Glossary list ─────────────────────────────────────────────────────────── */
+.glossary-count {
+  font-size: 12px;
+  color: #5bab88;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.glossary-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.glossary-row {
+  padding: 12px 4px;
+  border-bottom: 1px solid #e0f2e8;
+}
+.glossary-row:last-child { border-bottom: none; }
+
+.glossary-word-col {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.glossary-word {
+  font-size: 15px;
+  font-weight: 800;
+  color: #1a4a35;
+}
+
+.glossary-clue {
+  font-size: 13px;
+  color: #3a6a52;
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.glossary-subject-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #3a9068;
+  background: #e0f7ed;
+  border-radius: 10px;
+  padding: 2px 8px;
+}
+
+.difficulty-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-radius: 10px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+.difficulty-beginner     { background: #d8f0c8; color: #2a3a10; }
+.difficulty-intermediate { background: #f0d090; color: #5a3d0a; }
+.difficulty-advanced     { background: #f5b3be; color: #6a1a28; }
+
 /* ── Multi-word break markers (British crossword style) ──────────────────────*/
 .word-break {
   position: absolute;
@@ -651,6 +811,12 @@ body {
   .review-header { flex-direction: column; }
   .flashcard { padding: 22px 16px; }
   .flashcard-answer { font-size: 18px; }
+
+  /* Review Vocabulary / Flashcards pages — single-column filters and
+     tighter section padding on small screens. */
+  .review-section { padding: 16px; }
+  .filter-bar { flex-direction: column; gap: 10px; }
+  .glossary-list { max-height: none; }
 
   /* Stack single-column, reordered: grid, then clues, then action buttons. */
   .puzzle-layout {
